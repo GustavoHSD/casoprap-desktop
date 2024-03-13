@@ -6,10 +6,18 @@ import "./App.css";
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+    try {
+      setGreetMsg(
+        await invoke("create_volunteer", {
+          volunteer_req: { name, cpf, is_active: true },
+        })
+      );
+    } catch (err: any) {
+      setGreetMsg(err);
+    }
   }
 
   return (
@@ -42,9 +50,16 @@ function App() {
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Enter a name..."
         />
+        <input
+          id="greet-input"
+          onChange={(e) => setCpf(e.currentTarget.value)}
+          type="number"
+          minLength={11}
+          maxLength={11}
+          placeholder="Enter a cpf..."
+        />
         <button type="submit">Greet</button>
       </form>
-
       <p>{greetMsg}</p>
     </div>
   );

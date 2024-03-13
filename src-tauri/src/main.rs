@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
-use tauri::Runtime;
 
 mod api;
 
@@ -23,10 +22,16 @@ async fn establish_connection() -> SqlitePool {
 
 #[tokio::main]
 async fn main() {
-    let pool: SqlitePool = Runtime::new().unwrap().block_on(establish_connection());
+    let pool: SqlitePool = establish_connection().await;
     tauri::Builder::default()
         .manage(SqlitePoolWrapper{pool})
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            api::volunteer::create_volunteer,
+            api::volunteer::get_all_volunteers,
+            api::volunteer::get_volunteer,
+            api::volunteer::update_volunteer,
+            api::volunteer::delete_volunteer,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
