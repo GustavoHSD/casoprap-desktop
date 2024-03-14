@@ -1,3 +1,9 @@
 .icon {
   margin: 10px 40px;
 }
+
+.action-button {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}

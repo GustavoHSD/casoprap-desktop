@@ -3,6 +3,7 @@ import { Volunteer } from "../../types/volunteer";
 import "./styles.css";
 import { IoPersonAddSharp } from "react-icons/io5";
 import { MdOutlineDeleteForever } from "react-icons/md";
+import { MdOutlineEdit } from "react-icons/md";
 import { invoke } from "@tauri-apps/api";
 
 type VolunteerTableProps = {
@@ -13,19 +14,17 @@ export const VolunteerTable = ({
   isModalOpen,
   handleOpenModal,
 }: VolunteerTableProps) => {
-  const [volunteers, setVolunteers] = useState<any>();
+  const [volunteers, setVolunteers] = useState<Volunteer[]>();
   const [deletedVolunteer, setDeletedVolunteer] = useState(false);
 
   useEffect(() => {
     const fetchData = () => {
-      invoke("find_all_volunteers")
+      invoke("get_all_volunteers")
         .then((response) => {
-          setVolunteers(response);
+          setVolunteers(response as Volunteer[]);
         })
         .catch((error) => console.error(error));
     };
-
-    console.log(volunteers);
 
     fetchData();
   }, [isModalOpen, deletedVolunteer]);
@@ -36,20 +35,20 @@ export const VolunteerTable = ({
   };
 
   return (
-    <div className="wrapper table-wrapper max-width">
+    <div className="container">
       <div className="row">
         <div className="cell">
-          <div className="title title-margin">
-            <h1>Tabela de Voluntarios</h1>
-          </div>
+          <h1>Tabela de Voluntarios</h1>
         </div>
       </div>
       <div className="row">
         <div className="cell">
-          <button onClick={handleOpenModal} className="button button-margin">
+          <button onClick={handleOpenModal}>
             <IoPersonAddSharp size={32} />
           </button>
         </div>
+      </div>
+      <div className="row">
         <div className="cell">
           <table className="table">
             <thead>
@@ -61,21 +60,28 @@ export const VolunteerTable = ({
               </tr>
             </thead>
             <tbody>
-              {/*volunteers.map((volunteer: Volunteer) => (
-                <tr key={volunteer.id}>
-                  <td>{volunteer.name}</td>
-                  <td>{volunteer.cpf}</td>
-                  <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
-                  <td>
-                    <button
-                      onClick={() => handleDeleteVolunteer(volunteer.id)}
-                      className="button button-margin"
-                    >
-                      <MdOutlineDeleteForever size={32} />
-                    </button>
-                  </td>
-                </tr>
-              ))*/}
+              {volunteers &&
+                volunteers.map((volunteer: Volunteer) => (
+                  <tr key={volunteer.id}>
+                    <td>{volunteer.name}</td>
+                    <td>{volunteer.cpf}</td>
+                    <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
+                    <td>
+                      <button
+                        onClick={() => handleDeleteVolunteer(volunteer.id)}
+                        className="action-button"
+                      >
+                        <MdOutlineDeleteForever size={32} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteVolunteer(volunteer.id)}
+                        className="action-button"
+                      >
+                        <MdOutlineEdit size={32} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

@@ -37,6 +37,35 @@
 .row {
   display: flex;
   justify-content: center;
+  flex-direction: row;
+}
+
+.cell {
+  width: 100%;
+}
+
+.table {
+  margin: 25px auto;
+  min-width: 80vw;
+  border-collapse: collapse;
+  table-layout: auto;
+  white-space: nowrap;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 28px #00000070;
+}
+
+.table thead tr {
+  background: black;
+  height: 50px;
+}
+
+.table tbody tr:nth-of-type(even) {
+    background-color: #494949;
+}
+
+.table tbody tr:last-of-type {
+    border-bottom: 2px solid black;
 }
 
 a {

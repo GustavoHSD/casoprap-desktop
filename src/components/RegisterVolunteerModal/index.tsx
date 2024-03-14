@@ -1,9 +1,7 @@
-import "react";
-import Modal from "react-modal";
+import Modal from "react-modal"
 import { FormEvent, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import "./styles.css";
-import { CustomModalStyles } from "../../ModalStyles";
 import { invoke } from "@tauri-apps/api";
 import { sendNotification } from "@tauri-apps/api/notification";
 
@@ -19,9 +17,9 @@ export const RegisterVolunteerModal = ({
   const [name, setName] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
 
-  const handleSubmit = () => {
-    invoke("test").then((r) => console.log(r))
-    invoke("create_volunteer", { name, cpf })
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    invoke("create_volunteer", { volunteerReq: { name, cpf, is_active: true } })
       .then((response) => {
         if (response === "Success") {
           sendNotification("Voluntario cadastrado com sucesso!");
@@ -36,11 +34,10 @@ export const RegisterVolunteerModal = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
-      style={CustomModalStyles}
     >
       <div className="wrapper">
         <form className="form">
-          <button onClick={onRequestClose} className="button">
+          <button onClick={onRequestClose}>
             <IoCloseSharp size={24} />
           </button>
           <div className="row">

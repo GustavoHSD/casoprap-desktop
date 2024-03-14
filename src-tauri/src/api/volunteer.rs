@@ -5,7 +5,7 @@ use crate::SqlitePoolWrapper;
 
 use super::request_validation::RequestValidation;
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Volunteer {
     id: i64,
     name: String,
@@ -60,7 +60,13 @@ pub async fn get_all_volunteers(state: State<'_, SqlitePoolWrapper>,) -> Result<
     .await;
     
     match volunteer {
-        Ok(volunteer) => Ok(volunteer),
+        Ok(volunteer) => { 
+            for v in &volunteer {
+                println!("{:?}", v);
+            }
+
+            Ok(volunteer)  
+        },
         Err(error) => Err(error.to_string()),
     }
 }
