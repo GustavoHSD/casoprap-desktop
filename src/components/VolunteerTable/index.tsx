@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { Volunteer } from "../../types/volunteer";
 import "./styles.css";
-import { IoPersonAddSharp } from "react-icons/io5";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { MdOutlineEdit } from "react-icons/md";
 import { invoke } from "@tauri-apps/api";
+import { Button, Col, Container, Row, Stack, Table } from "react-bootstrap";
+import { RegisterVolunteerModal } from "../RegisterVolunteerModal";
+import { IoPersonAdd } from "react-icons/io5";
 
-type VolunteerTableProps = {
-  isModalOpen: boolean;
-  handleOpenModal: () => void;
-};
-export const VolunteerTable = ({
-  isModalOpen,
-  handleOpenModal,
-}: VolunteerTableProps) => {
+export const VolunteerTable = () => {
   const [volunteers, setVolunteers] = useState<Volunteer[]>();
   const [deletedVolunteer, setDeletedVolunteer] = useState(false);
+  const [show, setShow] = useState(false);
+
+  const handleOpenModal = () => setShow(true);
+  const handleCloseModal = () => setShow(false);
 
   useEffect(() => {
     const fetchData = () => {
@@ -27,7 +26,7 @@ export const VolunteerTable = ({
     };
 
     fetchData();
-  }, [isModalOpen, deletedVolunteer]);
+  }, [show, deletedVolunteer]);
 
   const handleDeleteVolunteer = (id: number) => {
     invoke("delete_volunteer", { id });
@@ -35,57 +34,45 @@ export const VolunteerTable = ({
   };
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="cell">
-          <h1>Tabela de Voluntarios</h1>
-        </div>
-      </div>
-      <div className="row">
-        <div className="cell">
-          <button onClick={handleOpenModal}>
-            <IoPersonAddSharp size={32} />
-          </button>
-        </div>
-      </div>
-      <div className="row">
-        <div className="cell">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Cpf</th>
-                <th>Esta ativo</th>
-                <th>Acoes</th>
+    <div>
+      <Button variant="dark" onClick={handleOpenModal}>
+        <IoPersonAdd />
+      </Button>
+      <Table striped hover>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cpf</th>
+            <th>Esta ativo</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {volunteers &&
+            volunteers.map((volunteer: Volunteer) => (
+              <tr key={volunteer.id}>
+                <td>{volunteer.name}</td>
+                <td>{volunteer.cpf}</td>
+                <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
+                <td>
+                  <Button
+                    onClick={() => handleDeleteVolunteer(volunteer.id)}
+                    className="action-button"
+                  >
+                    <MdOutlineDeleteForever size={32} />
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteVolunteer(volunteer.id)}
+                    className="action-button"
+                  >
+                    <MdOutlineEdit size={32} />
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {volunteers &&
-                volunteers.map((volunteer: Volunteer) => (
-                  <tr key={volunteer.id}>
-                    <td>{volunteer.name}</td>
-                    <td>{volunteer.cpf}</td>
-                    <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDeleteVolunteer(volunteer.id)}
-                        className="action-button"
-                      >
-                        <MdOutlineDeleteForever size={32} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteVolunteer(volunteer.id)}
-                        className="action-button"
-                      >
-                        <MdOutlineEdit size={32} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))}
+        </tbody>
+      </Table>
+      <RegisterVolunteerModal show={show} handleClose={handleCloseModal} />
     </div>
   );
 };

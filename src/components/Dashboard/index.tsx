@@ -68,7 +68,7 @@ export const Dashboard = () => {
       </nav>
 
       {selectedTable === "volunteer" ? (
-        <VolunteerTable isModalOpen={isVolunteerModalOpen} handleOpenModal={handleOpenVolunteerModal} />
+        <VolunteerTable show={isVolunteerModalOpen} handleClose={handleOpenVolunteerModal} />
       ) : selectedTable === "animal" ? (
         <AnimalTable isModalOpen={isAnimalModalOpen} handleOpenModal={handleOpenAnimalModal} />
       ) : selectedTable === "resource" ? (
