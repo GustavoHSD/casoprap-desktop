@@ -5,3 +5,11 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafb);
 }
+
+/* body {
+    margin: 0;
+    display: flex;
+    min-width: 320px;
+    min-height: 100vh;
+}
+*/

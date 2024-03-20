@@ -1,140 +1,117 @@
 import { useEffect, useState } from "react";
 import { Animal } from "../../types/animal";
 import "./styles.css";
-import { IoPersonAddSharp } from "react-icons/io5";
-import { Volunteer } from "../../types/volunteer";
+import { IoPersonAdd } from "react-icons/io5";
+import Button from "react-bootstrap/esm/Button";
+import Table from "react-bootstrap/esm/Table";
+import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
+import { RegisterAnimalModal } from "../RegisterAnimalModal";
 import { invoke } from "@tauri-apps/api";
+import { Volunteer } from "../../types/volunteer";
 import { sendNotification } from "@tauri-apps/api/notification";
 
-type AnimalTableProps = {
-  isModalOpen: boolean;
-  handleOpenModal: () => void;
-};
+export const AnimalTable = () => {
+  const [animals, setAnimals] = useState<Animal[]>();
+  const [show, setShow] = useState(false);
 
-export const AnimalTable = ({
-  isModalOpen,
-  handleOpenModal,
-}: AnimalTableProps) => {
-  const [animals, setAnimals] = useState<any>();
-  const [adopted, setAdopted] = useState(false);
-  const [volunteers, setVolunteers] = useState<any>();
+  const [deletedAnimal, setDeletedAnimal] = useState(false);
 
-  /*
-    api::volunteer::create_volunteer,
-    api::volunteer::find_all_volunteers,
-    api::volunteer::find_volunteer_by_id,
-    api::animal::create_animal,
-    api::animal::find_all_animals,
-    api::animal::find_animal_by_id,
-    api::animal::find_animal_by_volunteer,
-    api::animal::set_as_adopted,
-    api::animal::set_as_not_adopted,
-    api::resource::create_resource,
-    api::resource::find_all_resources,
-    api::resource::find_resource_by_id,
-    api::resource::find_resource_by_volunteer,
-*/
-  const setAsAdopted = async (id: number) => {
-    invoke("set_as_adopted", { id });
-    setAdopted(!adopted);
-  };
-
-  const setAsNotAdopted = async (id: number) => {
-    invoke("set_as_not_adopted", { id });
-    setAdopted(!adopted);
-  };
+  const handleOpenModal = () => setShow(true);
+  const handleCloseModal = () => setShow(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      invoke("find_all_animals")
-        .then((response) => setAnimals(response))
-        .catch((error) => sendNotification(error));
-
-      const volunteerIds = animals.map(
-        (animal: Animal) => animal.responsible_volunteer
-      );
-
-      const volunteerResponses = await Promise.all(
-        volunteerIds.map((id: number) => invoke("find_volunteer_by_id", { id }))
-      );
-
-      const volunteerData = volunteerResponses.map((response) => response as Volunteer);
-
-      setVolunteers(volunteerData);
+    const fetchData = () => {
+      invoke("get_all_animals")
+        .then((response) => {
+          setAnimals(response as Animal[]);
+        })
+        .catch((error) => console.error(error));
     };
+
     fetchData();
-  }, [isModalOpen, adopted]);
+  }, [show, deletedAnimal]);
+
+  const handleDeleteAnimal = (id: number) => {
+    invoke("delete_animal", { id });
+    setDeletedAnimal(!deletedAnimal);
+  };
+
+  const getResponsibleVolunteer = (id: number): Promise<Volunteer> => {
+    const volunteer = invoke("get_volunteer", { id })
+      .then((response) => {
+        return response as Volunteer;
+      })
+      .catch((error) => {
+        sendNotification(error);
+        console.error(error);
+        throw error;
+      });
+    return volunteer;
+  };
 
   return (
-    <div className="wrapper table-wrapper max-width">
-      <div className="row">
-        <div className="cell">
-          <div className="title title-margin">
-            <h1>Tabela de Animais</h1>
-          </div>
-        </div>
-      </div>
-      <div className="row">
-        <div className="cell button-margin">
-          <button onClick={handleOpenModal} className="button">
-            <IoPersonAddSharp size={32} />
-          </button>
-        </div>
-        <div className="cell">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>nome</th>
-                <th>raça</th>
-                <th>tipo</th>
-                <th>idade</th>
-                <th>local de resgate</th>
-                <th>é castrado</th>
-                <th>é adotado</th>
-                <th>nome do voluntario</th>
-                <th>açoes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/*animals.map((animal: Animal) => {
-                const associatedVolunteer = volunteers.find(
-                  (volunteer: Volunteer) =>
-                    volunteer.id === animal.responsible_volunteer
-                );
-                return (
-                  <tr key={animal.id}>
-                    <td>{animal.name}</td>
-                    <td>{animal.race}</td>
-                    <td>{animal.a_type === "cat" ? "Gato" : "Cachorro"}</td>
-                    <td>{animal.age}</td>
-                    <td>{animal.rescue_location}</td>
-                    <td>{animal.is_castrated ? "Sim" : "Nao"}</td>
-                    <td>{animal.is_adopted ? "Sim" : "Nao"}</td>
-                    <td>{associatedVolunteer?.name}</td>
-                    <td>
-                      {animal.is_adopted ? (
-                        <button
-                          onClick={() => setAsNotAdopted(animal.id)}
-                          className="action-button"
-                        >
-                          Marcar como nao adotado
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setAsAdopted(animal.id)}
-                          className="action-button"
-                        >
-                          Marcar como adotado
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })*/}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div style={{ width: "90vw", margin: "0 auto" }}>
+      <Button variant="dark" onClick={handleOpenModal}>
+        <IoPersonAdd />
+      </Button>
+      <Table
+        striped
+        bordered
+        responsive="xxl"
+        hover
+        title="Animal table"
+        style={{ whiteSpace: "nowrap" }}
+      >
+        <thead>
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Raca</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Idade</th>
+            <th scope="col">Local de resgate</th>
+            <th scope="col">E adotado</th>
+            <th scope="col">E cadastrado</th>
+            <th scope="col">Voluntario responsavel</th>
+            <th scope="col">Acoes</th>
+          </tr>
+        </thead>
+        <tbody className="align-middle">
+          {animals &&
+            animals.map((animal: Animal) => {
+              return (
+                <tr key={animal.id}>
+                  <td style={{ maxWidth: "20vw", overflowX: "auto" }}>
+                    {animal.name}
+                  </td>
+                  <td>{animal.race}</td>
+                  <td>{animal.a_type}</td>
+                  <td>{animal.age}</td>
+                  <td>{animal.rescue_location}</td>
+                  <td>{animal.is_adopted ? "sim" : "nao"}</td>
+                  <td>{animal.is_castrated ? "sim" : "nao"}</td>
+                  <td>{animal.responsible_volunteer}</td>
+                  <td>
+                    <Button
+                      className="action-button"
+                      title="deletar"
+                      onClick={() => handleDeleteAnimal(animal.id)}
+                    >
+                      <MdOutlineDeleteForever size={32} color="black" />
+                    </Button>
+                    <Button
+                      onClick={() => {}}
+                      className="action-button"
+                      title="editar"
+                    >
+                      <MdOutlineEdit size={32} color="black" />
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </Table>
+      <RegisterAnimalModal show={show} handleClose={handleCloseModal} />
     </div>
   );
 };

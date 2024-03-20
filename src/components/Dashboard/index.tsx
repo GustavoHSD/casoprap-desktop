@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RegisterVolunteerModal } from "../RegisterVolunteerModal";
-import { RegisterAnimalModal } from "../RegisterAnimalModal";
+import { RegisterAnimalModal } from "../RegisterAnimalModal/RegisterAnimalModal";
 import { RegisterResourceModal } from "../RegisterResourceModal";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { FaDog } from "react-icons/fa";
@@ -70,7 +70,7 @@ export const Dashboard = () => {
       {selectedTable === "volunteer" ? (
         <VolunteerTable show={isVolunteerModalOpen} handleClose={handleOpenVolunteerModal} />
       ) : selectedTable === "animal" ? (
-        <AnimalTable isModalOpen={isAnimalModalOpen} handleOpenModal={handleOpenAnimalModal} />
+        <AnimalTable show={isAnimalModalOpen} handleClose={handleOpenAnimalModal} />
       ) : selectedTable === "resource" ? (
         <ResourceTable isModalOpen={isResourceModalOpen} handleOpenModal={handleOpenResourceModal} />
       ) : null}

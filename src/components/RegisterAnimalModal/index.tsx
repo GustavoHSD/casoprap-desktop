@@ -1,46 +1,91 @@
-import Modal from "react-modal";
-import { FormEvent, useEffect, useState } from "react";
-import { IoCloseSharp } from "react-icons/io5";
-import { CustomModalStyles } from "../../ModalStyles";
-import Select from "react-select";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import "./styles.css";
 import { Volunteer } from "../../types/volunteer";
 import { invoke } from "@tauri-apps/api";
 import { sendNotification } from "@tauri-apps/api/notification";
+import Form from "react-bootstrap/esm/Form";
+import Button from "react-bootstrap/esm/Button";
+import Modal from "react-bootstrap/esm/Modal";
+import Select from "react-select";
 
-type VolunteerOption = {
-  value: number;
-  label: string;
+type VolunteerForm = {
+  name: string;
+  race: string;
+  a_type: string;
+  age: number | undefined;
+  rescue_location: string;
+  is_castrado: boolean;
+  responsible_volunteer: number | undefined;
 };
 
 type RegisterAnimalModalProps = {
-  isOpen: boolean;
-  onRequestClose: () => void;
+  show: boolean;
+  handleClose: () => void;
 };
 
+type Option = {
+  label: string;
+  value: number;
+};
 export const RegisterAnimalModal = ({
-  isOpen,
-  onRequestClose,
+  show,
+  handleClose,
 }: RegisterAnimalModalProps) => {
-  const [name, setName] = useState<string>("");
-  const [race, setRace] = useState<string>("");
-  const [type, setType] = useState<string>("");
-  const [age, setAge] = useState<string>("");
-  const [rescueLocation, setRescueLocation] = useState<string>("");
-  const [isCastrado, setIsCastrado] = useState<boolean>();
-  const [volunteerId, setVolunteerId] = useState<number>();
-  const [volunteerOptions, setVolunteerOptions] = useState<VolunteerOption[]>(
-    []
-  );
+  const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
+  const [selectedOption, setSelectedOption] = useState<number>();
+
+  const [form, setForm] = useState<VolunteerForm>({
+    name: "",
+    race: "",
+    a_type: "",
+    age: 0,
+    rescue_location: "",
+    is_castrado: false,
+    responsible_volunteer: -1,
+  });
+
+  const handleFormChange = (
+    event:
+      | ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: string } }
+  ) => {
+    const { name, value } = event.target;
+    let parsedValue: number | boolean | undefined;
+
+    if (name === "age") {
+      parsedValue = parseInt(value);
+    } else if (name === "responsible_volunteer") {
+      parsedValue = parseInt(value);
+    } else if (name === "is_castrado") {
+      parsedValue = value === "yes" ? true : false;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: parsedValue ?? value,
+    }));
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    invoke("create_animal", { animalReq: form })
+      .then((response) => {
+        if (response === "Success") {
+          sendNotification("Animal cadastrado com sucesso!");
+          handleClose();
+        }
+      })
+      .catch((error) => sendNotification(error));
+  };
 
   useEffect(() => {
     const fetchVolunteers = async () => {
-      invoke("find_all_volunteers").then((response) => {
+      invoke("get_all_volunteers").then((response) => {
         const volunteers = response as Volunteer[];
-        setVolunteerOptions(
-          volunteers.map((volunteer: Volunteer) => ({
+        setVolunteerOption(
+          volunteers.map((volunteer) => ({
+            label: `${volunteer.id} - Nome: ${volunteer.name}, CPF: ${volunteer.cpf}`,
             value: volunteer.id,
-            label: volunteer.name + "/" + volunteer.cpf,
           }))
         );
       });
@@ -49,173 +94,122 @@ export const RegisterAnimalModal = ({
     fetchVolunteers();
   }, []);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    invoke("create_animal", {
-      name,
-      race,
-      a_type: type,
-      age: Number(age),
-      rescue_location: rescueLocation,
-      is_castrado: isCastrado,
-      responsible_volunteer: volunteerId,
-    })
-      .then((response) => {
-        if (response === "Success") {
-          sendNotification("Animal cadastrado com sucesso!");
-          onRequestClose();
-        } else {
-          sendNotification("Algo de errado aconteceu");
-        }
-      })
-      .catch((error) => sendNotification(error));
-  };
-
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      style={CustomModalStyles}
-      shouldCloseOnEsc={false}
-    >
-      <div className="wrapper">
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="cell">
-              <button onClick={onRequestClose} className="button">
-                <IoCloseSharp size={24} />
-              </button>
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Adicionar Animal</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form id="animal-form" onSubmit={handleSubmit}>
+          <Form.Group className="mb-4">
+            <Form.Label>Nome do animal</Form.Label>
+            <Form.Control
+              name="name"
+              type="text"
+              placeholder="Digite o nome do voluntario"
+              value={form.name}
+              onChange={handleFormChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>Raca do animal</Form.Label>
+            <Form.Control
+              name="race"
+              type="text"
+              placeholder="Digite a raca do animal"
+              value={form.race}
+              onChange={handleFormChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>Tipo do animal</Form.Label>
+            <div className="d-flex justify-content-evenly">
+              <Form.Check
+                inline
+                label="gato"
+                type="radio"
+                name="a_type"
+                value="cat"
+                onChange={handleFormChange}
+              />
+              <Form.Check
+                inline
+                label="cachorro"
+                type="radio"
+                name="a_type"
+                value="dog"
+                onChange={handleFormChange}
+              />
             </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <h1 className="title">Cadastrar Animal</h1>
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>Idade do animal (Deixe 0 se nao souber)</Form.Label>
+            <Form.Control
+              name="age"
+              type="number"
+              placeholder="Digite a idade do animal"
+              value={form.age}
+              onChange={handleFormChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>Local de resgate do animal</Form.Label>
+            <Form.Control
+              name="rescue_location"
+              type="text"
+              placeholder="Digite o local de resgate do animal"
+              value={form.rescue_location}
+              onChange={handleFormChange}
+            />
+          </Form.Group>
+          <Form.Group className="mb-4">
+            <Form.Label>O animal e castrado?</Form.Label>
+            <div className="d-flex justify-content-evenly">
+              <Form.Check
+                inline
+                label="sim"
+                type="radio"
+                name="is_castrado"
+                value="yes"
+                onChange={handleFormChange}
+              />
+              <Form.Check
+                inline
+                label="nao"
+                type="radio"
+                name="is_castrado"
+                value="no"
+                onChange={handleFormChange}
+              />
             </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field">
-                Nome do animal
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field">
-                Raca do animal
-                <input
-                  value={race}
-                  onChange={(e) => setRace(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">Tipo do animal</div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field align-center">
-                Gato
-                <input
-                  className="radio"
-                  type="radio"
-                  value="cat"
-                  checked={type === "cat"}
-                  onChange={() => setType("cat")}
-                />
-              </div>
-            </div>
-            <div className="cell">
-              <div className="input-field align-center">
-                Cachorro
-                <input
-                  className="radio"
-                  type="radio"
-                  value="dog"
-                  checked={type === "dog"}
-                  onChange={() => setType("dog")}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field">
-                Idade do animal
-                <input
-                  value={age}
-                  type="text"
-                  inputMode="numeric"
-                  onChange={(e) => setAge(e.target.value)}
-                  required
-                  pattern="[0-9]{2}"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">O animal e castrado?</div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field align-center">
-                Sim
-                <input
-                  className="radio"
-                  type="radio"
-                  value="true"
-                  checked={isCastrado}
-                  onChange={() => setIsCastrado(true)}
-                />
-              </div>
-            </div>
-            <div className="cell">
-              <div className="input-field align-center">
-                Nao
-                <input
-                  className="radio"
-                  type="radio"
-                  value="false"
-                  checked={!isCastrado}
-                  onChange={() => setIsCastrado(false)}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field">
-                Local de resgate do animal
-                <input
-                  value={rescueLocation}
-                  onChange={(e) => setRescueLocation(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="cell">
-              <div className="input-field">
-                Voluntario Responsavel
-                <Select
-                  required
-                  options={volunteerOptions}
-                  onChange={(selected) => setVolunteerId(selected?.value)}
-                />
-              </div>
-            </div>
-          </div>
-          <button className="submit-button">Cadastrar animal</button>
-        </form>
-      </div>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Voluntario Responsavel</Form.Label>
+            <Select
+              name="responsible_volunteer"
+              options={volunteerOption}
+              onChange={(o) => {
+                setSelectedOption(o?.value);
+                handleFormChange({
+                  target: {
+                    name: "responsible_volunteer",
+                    value: selectedOption?.toString() ?? "",
+                  },
+                });
+              }}
+            />
+          </Form.Group>
+          <Button
+            type="submit"
+            form="animal-form"
+            className="mx-auto"
+            variant="primary"
+          >
+            Cadastrar voluntario
+          </Button>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer></Modal.Footer>
     </Modal>
   );
 };

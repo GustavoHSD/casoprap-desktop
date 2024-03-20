@@ -1,2 +1,14 @@
+tbody td, thead th {
+  text-align: center;
+}
 
+tbody td:first-child {
+  text-align: start;
+  padding: 0 50px 
+}
 
+tbody td:last-child {
+  text-align: end;
+
+  padding: 0 50px 
+}

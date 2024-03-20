@@ -1,8 +1,9 @@
 export type Volunteer = {
   id: number;
-  name: String;
-  cpf: String;
+  name: string;
+  cpf: string;
   is_active: boolean;
 };
 
 export type VolunteerReq = Omit<Volunteer, 'id'>; 
+
