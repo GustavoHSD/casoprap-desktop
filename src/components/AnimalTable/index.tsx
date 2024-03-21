@@ -66,7 +66,7 @@ export const AnimalTable = () => {
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col" style={{ width: "40%" }}>
+            <th scope="col" style={{ maxWidth: "100px" }}>
               Nome
             </th>
             <th scope="col">Raca</th>
@@ -75,10 +75,10 @@ export const AnimalTable = () => {
             <th scope="col" style={{ width: "40%" }}>
               Local de resgate
             </th>
-            <th scope="col">E adotado</th>
-            <th scope="col">E cadastrado</th>
+            <th scope="col">É adotado</th>
+            <th scope="col">É cadastrado</th>
             <th scope="col">Voluntario responsavel</th>
-            <th scope="col">Acoes</th>
+            <th scope="col">Ações</th>
           </tr>
         </thead>
         <tbody className="align-middle">
@@ -89,9 +89,9 @@ export const AnimalTable = () => {
                   <td scope="row" style={{ padding: 20 }}>
                     {animal.id}
                   </td>
-                  <td style={{ overflowX: "auto" }}>{animal.name}</td>
+                  <td style={{ maxWidth: "200px", overflowX: "auto" }}>{animal.name}</td>
                   <td>{animal.race}</td>
-                  <td>{animal.a_type}</td>
+                  <td>{animal.a_type === "dog" ? "cachorro" : "gato"}</td>
                   <td>{animal.age}</td>
                   <td>{animal.rescue_location}</td>
                   <td>{animal.is_adopted ? "sim" : "nao"}</td>
