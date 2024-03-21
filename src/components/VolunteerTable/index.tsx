@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Volunteer } from "../../types/volunteer";
-import "./styles.css";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { MdOutlineEdit } from "react-icons/md";
 import { invoke } from "@tauri-apps/api";
-import { Button, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { RegisterVolunteerModal } from "../RegisterVolunteerModal";
 import { IoPersonAdd } from "react-icons/io5";
 import { ActionButton } from "../button";
@@ -51,9 +50,7 @@ export const VolunteerTable = () => {
       >
         <thead>
           <tr>
-            <th scope="col" style={{ padding: 0 }}>
-              #
-            </th>
+            <th scope="col">#</th>
             <th scope="col" style={{ width: "45%" }}>
               Nome
             </th>

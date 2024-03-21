@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Animal } from "../../types/animal";
-import "./styles.css";
 import { IoPersonAdd } from "react-icons/io5";
-import Button from "react-bootstrap/esm/Button";
 import Table from "react-bootstrap/esm/Table";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { RegisterAnimalModal } from "../RegisterAnimalModal";
