@@ -7,6 +7,7 @@ import { invoke } from "@tauri-apps/api";
 import { Button, Table } from "react-bootstrap";
 import { RegisterVolunteerModal } from "../RegisterVolunteerModal";
 import { IoPersonAdd } from "react-icons/io5";
+import { ActionButton } from "../button";
 
 export const VolunteerTable = () => {
   const [volunteers, setVolunteers] = useState<Volunteer[]>();
@@ -34,10 +35,12 @@ export const VolunteerTable = () => {
   };
 
   return (
-    <div style={{ width: '80vw', margin: '0 auto' }}>
-      <Button variant="dark" onClick={handleOpenModal}>
-        <IoPersonAdd />
-      </Button>
+    <div style={{ width: "90vw", margin: "0 auto" }}>
+      <ActionButton
+        action={handleOpenModal}
+        icon={<IoPersonAdd />}
+        title="adicionar"
+      />
       <Table
         striped
         bordered
@@ -48,34 +51,51 @@ export const VolunteerTable = () => {
       >
         <thead>
           <tr>
-            <th scope="col">Nome</th>
-            <th scope="col">Cpf</th>
+            <th scope="col" style={{ padding: 0 }}>
+              #
+            </th>
+            <th scope="col" style={{ width: "45%" }}>
+              Nome
+            </th>
+            <th scope="col" style={{ width: "30%" }}>
+              Cpf
+            </th>
             <th scope="col">Esta ativo</th>
-            <th scope="col" style={{ width: "15vw"}}>Acoes</th>
+            <th scope="col" style={{ width: "15%" }}>
+              Acoes
+            </th>
           </tr>
         </thead>
         <tbody className="align-middle">
           {volunteers &&
             volunteers.map((volunteer: Volunteer) => (
               <tr key={volunteer.id}>
+                <td scope="row" style={{ padding: 20, margin: 0 }}>
+                  {volunteer.id}
+                </td>
                 <td>{volunteer.name}</td>
                 <td>{volunteer.cpf}</td>
                 <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
                 <td className="d-flex justify-content-evenly">
-                  <Button
-                    onClick={() => handleDeleteVolunteer(volunteer.id)}
-                    variant="outline-secondary p-2 m-1"
+                  <ActionButton
+                    action={() => handleDeleteVolunteer(volunteer.id)}
+                    icon={
+                      <MdOutlineDeleteForever
+                        className="icon"
+                        size={32}
+                        color="black"
+                      />
+                    }
                     title="deletar"
-                  >
-                    <MdOutlineDeleteForever size={32}  color="black"/>
-                  </Button>
-                  <Button
-                    onClick={() => {}}
-                    variant="outline-secondary p-2 m-1"
-                    title="editar" 
-                  >
-                    <MdOutlineEdit size={32} color="black"/>
-                  </Button>
+                  />
+
+                  <ActionButton
+                    action={() => {}}
+                    icon={
+                      <MdOutlineEdit className="icon" size={32} color="black" />
+                    }
+                    title="editar"
+                  />
                 </td>
               </tr>
             ))}

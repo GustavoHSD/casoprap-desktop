@@ -9,6 +9,7 @@ import { RegisterAnimalModal } from "../RegisterAnimalModal";
 import { invoke } from "@tauri-apps/api";
 import { Volunteer } from "../../types/volunteer";
 import { sendNotification } from "@tauri-apps/api/notification";
+import { ActionButton } from "../button";
 
 export const AnimalTable = () => {
   const [animals, setAnimals] = useState<Animal[]>();
@@ -51,9 +52,11 @@ export const AnimalTable = () => {
 
   return (
     <div style={{ width: "90vw", margin: "0 auto" }}>
-      <Button variant="dark" onClick={handleOpenModal}>
-        <IoPersonAdd />
-      </Button>
+      <ActionButton
+        action={handleOpenModal}
+        icon={<IoPersonAdd />}
+        title="adicionar"
+      />
       <Table
         striped
         bordered
@@ -64,11 +67,16 @@ export const AnimalTable = () => {
       >
         <thead>
           <tr>
-            <th scope="col">Nome</th>
+            <th scope="col">#</th>
+            <th scope="col" style={{ width: "40%" }}>
+              Nome
+            </th>
             <th scope="col">Raca</th>
             <th scope="col">Tipo</th>
             <th scope="col">Idade</th>
-            <th scope="col">Local de resgate</th>
+            <th scope="col" style={{ width: "40%" }}>
+              Local de resgate
+            </th>
             <th scope="col">E adotado</th>
             <th scope="col">E cadastrado</th>
             <th scope="col">Voluntario responsavel</th>
@@ -80,9 +88,10 @@ export const AnimalTable = () => {
             animals.map((animal: Animal) => {
               return (
                 <tr key={animal.id}>
-                  <td style={{ maxWidth: "20vw", overflowX: "auto" }}>
-                    {animal.name}
+                  <td scope="row" style={{ padding: 20 }}>
+                    {animal.id}
                   </td>
+                  <td style={{ overflowX: "auto" }}>{animal.name}</td>
                   <td>{animal.race}</td>
                   <td>{animal.a_type}</td>
                   <td>{animal.age}</td>
@@ -90,21 +99,30 @@ export const AnimalTable = () => {
                   <td>{animal.is_adopted ? "sim" : "nao"}</td>
                   <td>{animal.is_castrated ? "sim" : "nao"}</td>
                   <td>{animal.responsible_volunteer}</td>
-                  <td>
-                    <Button
-                      className="action-button"
+                  <td className="d-flex justify-content-evenly">
+                    <ActionButton
+                      action={() => handleDeleteAnimal(animal.id)}
+                      icon={
+                        <MdOutlineDeleteForever
+                          className="icon"
+                          size={32}
+                          color="black"
+                        />
+                      }
                       title="deletar"
-                      onClick={() => handleDeleteAnimal(animal.id)}
-                    >
-                      <MdOutlineDeleteForever size={32} color="black" />
-                    </Button>
-                    <Button
-                      onClick={() => {}}
-                      className="action-button"
+                    />
+
+                    <ActionButton
+                      action={() => {}}
+                      icon={
+                        <MdOutlineEdit
+                          className="icon"
+                          size={32}
+                          color="black"
+                        />
+                      }
                       title="editar"
-                    >
-                      <MdOutlineEdit size={32} color="black" />
-                    </Button>
+                    />
                   </td>
                 </tr>
               );
