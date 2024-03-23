@@ -7,16 +7,7 @@ import Form from "react-bootstrap/esm/Form";
 import Button from "react-bootstrap/esm/Button";
 import Modal from "react-bootstrap/esm/Modal";
 import Select from "react-select";
-
-type VolunteerForm = {
-  name: string;
-  race: string;
-  a_type: string;
-  age: number | undefined;
-  rescue_location: string;
-  is_castrado: boolean;
-  responsible_volunteer: number | undefined;
-};
+import { AnimalRequest } from "../../types/animal";
 
 type RegisterAnimalModalProps = {
   show: boolean;
@@ -27,21 +18,22 @@ type Option = {
   label: string;
   value: number;
 };
+
 export const RegisterAnimalModal = ({
   show,
   handleClose,
 }: RegisterAnimalModalProps) => {
   const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<number>();
-
-  const [form, setForm] = useState<VolunteerForm>({
-    name: "",
-    race: "",
-    a_type: "",
-    age: 0,
-    rescue_location: "",
-    is_castrado: false,
-    responsible_volunteer: -1,
+  const [form, setForm] = useState<AnimalRequest>({
+    animal_name: "",
+    animal_race: "",
+    animal_type: "",
+    animal_age: 0,
+    animal_rescue_location: "",
+    animal_is_adopted: false,
+    animal_is_castrado: false,
+    animal_responsible_volunteer: -1,
   });
 
   const handleFormChange = (
@@ -50,15 +42,15 @@ export const RegisterAnimalModal = ({
       | { target: { name: string; value: string } }
   ) => {
     const { name, value } = event.target;
-    let parsedValue: number | boolean | undefined;
+    let parsedValue: number | boolean | string | undefined = undefined;
 
-    if (name === "age") {
+    if (name === "animal_age") {
       parsedValue = parseInt(value);
-    } else if (name === "responsible_volunteer") {
+    } else if (name === "animal_responsible_volunteer") {
       parsedValue = parseInt(value);
-    } else if (name === "is_castrado") {
+    } else if (name === "animal_is_castrado") {
       parsedValue = value === "yes" ? true : false;
-    }
+    } 
 
     setForm((prev) => ({
       ...prev,
@@ -84,8 +76,8 @@ export const RegisterAnimalModal = ({
         const volunteers = response as Volunteer[];
         setVolunteerOption(
           volunteers.map((volunteer) => ({
-            label: `${volunteer.id} - Nome: ${volunteer.name}, CPF: ${volunteer.cpf}`,
-            value: volunteer.id,
+            label: `${volunteer.volunteer_id} - Nome: ${volunteer.volunteer_name}, CPF: ${volunteer.volunteer_cpf}`,
+            value: volunteer.volunteer_id,
           }))
         );
       });
@@ -104,20 +96,20 @@ export const RegisterAnimalModal = ({
           <Form.Group className="mb-4">
             <Form.Label>Nome do animal</Form.Label>
             <Form.Control
-              name="name"
+              name="animal_name"
               type="text"
               placeholder="Digite o nome do voluntario"
-              value={form.name}
+              value={form.animal_name}
               onChange={handleFormChange}
             />
           </Form.Group>
           <Form.Group className="mb-4">
             <Form.Label>Raca do animal</Form.Label>
             <Form.Control
-              name="race"
+              name="animal_race"
               type="text"
               placeholder="Digite a raca do animal"
-              value={form.race}
+              value={form.animal_race}
               onChange={handleFormChange}
             />
           </Form.Group>
@@ -128,7 +120,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="gato"
                 type="radio"
-                name="a_type"
+                name="animal_type"
                 value="cat"
                 onChange={handleFormChange}
               />
@@ -136,7 +128,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="cachorro"
                 type="radio"
-                name="a_type"
+                name="animal_type"
                 value="dog"
                 onChange={handleFormChange}
               />
@@ -145,20 +137,20 @@ export const RegisterAnimalModal = ({
           <Form.Group className="mb-4">
             <Form.Label>Idade do animal (Deixe 0 se nao souber)</Form.Label>
             <Form.Control
-              name="age"
+              name="animal_age"
               type="number"
               placeholder="Digite a idade do animal"
-              value={form.age}
+              value={form.animal_age}
               onChange={handleFormChange}
             />
           </Form.Group>
           <Form.Group className="mb-4">
             <Form.Label>Local de resgate do animal</Form.Label>
             <Form.Control
-              name="rescue_location"
+              name="animal_rescue_location"
               type="text"
               placeholder="Digite o local de resgate do animal"
-              value={form.rescue_location}
+              value={form.animal_rescue_location}
               onChange={handleFormChange}
             />
           </Form.Group>
@@ -169,7 +161,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="sim"
                 type="radio"
-                name="is_castrado"
+                name="animal_is_castrado"
                 value="yes"
                 onChange={handleFormChange}
               />
@@ -177,7 +169,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="nao"
                 type="radio"
-                name="is_castrado"
+                name="animal_is_castrado"
                 value="no"
                 onChange={handleFormChange}
               />
@@ -186,13 +178,13 @@ export const RegisterAnimalModal = ({
           <Form.Group>
             <Form.Label>Voluntario Responsavel</Form.Label>
             <Select
-              name="responsible_volunteer"
+              name="animal_responsible_volunteer"
               options={volunteerOption}
               onChange={(o) => {
                 setSelectedOption(o?.value);
                 handleFormChange({
                   target: {
-                    name: "responsible_volunteer",
+                    name: "animal_responsible_volunteer",
                     value: selectedOption?.toString() ?? "",
                   },
                 });
@@ -205,7 +197,7 @@ export const RegisterAnimalModal = ({
             className="mx-auto"
             variant="primary"
           >
-            Cadastrar voluntario
+            Cadastrar animal
           </Button>
         </Form>
       </Modal.Body>

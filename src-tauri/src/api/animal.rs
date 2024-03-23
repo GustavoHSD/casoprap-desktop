@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tauri::State;
-use crate::{error::ResponseError, SqlitePoolWrapper};
+use crate::{error::ValidationError, SqlitePoolWrapper};
 
 use super::{request_validation::RequestValidation, volunteer::Volunteer};
 
@@ -29,7 +29,7 @@ pub struct AnimalRequest {
     animal_responsible_volunteer: i64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct AnimalEager {
     animal_id: i64,
     animal_name: String,
@@ -54,34 +54,37 @@ pub struct AnimalEagerResponse {
 
 
 impl AnimalEager {
-    fn into_response(&self) -> Result<AnimalEagerResponse, ResponseError> {
+    fn into_response(&self) -> AnimalEagerResponse {
         let response = AnimalEagerResponse {
             animal: Animal {
                 animal_id: self.animal_id,
-                animal_name: self.animal_name,
-                animal_race: self.animal_race,
-                animal_type: self.animal_type,
+                animal_name: self.animal_name.clone(),
+                animal_race: self.animal_race.clone(),
+                animal_type: self.animal_type.clone(),
                 animal_age: self.animal_age,
-                animal_rescue_location: self.animal_rescue_location,
+                animal_rescue_location: self.animal_rescue_location.clone(),
                 animal_is_adopted: self.animal_is_adopted,
                 animal_is_castrado: self.animal_is_castrado, 
                 animal_responsible_volunteer: self.animal_responsible_volunteer,
             },
             volunteer: Volunteer {
                 volunteer_id: self.volunteer_id,
-                volunteer_name: self.volunteer_name,
-                volunteer_cpf: self.volunteer_cpf,
+                volunteer_name: self.volunteer_name.clone(),
+                volunteer_cpf: self.volunteer_cpf.clone(),
                 volunteer_is_active: self.volunteer_is_active,
             }
         };
-        Ok(response) 
+        for r in response {
+            println!("{:?}", r);
+        }
+        response 
     }
 }
 
 impl RequestValidation for AnimalRequest {
-    fn validate_fields(&self) -> Result<(), crate::error::ValidationError> {
+    fn validate_fields(&self) -> Result<(), ValidationError> {
         if self.animal_name.trim().is_empty() || self.animal_race.trim().is_empty() || self.animal_type.trim().is_empty() || self.animal_rescue_location.is_empty() {
-            return Err(crate::error::ValidationError::FieldValidationError("All fields must not be empty".to_owned()))
+            return Err(ValidationError::FieldValidationError("All fields must not be empty".to_owned()))
         }
         Ok(())
     }
@@ -130,21 +133,18 @@ pub async fn get_all_animals(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec
 }
 
 #[tauri::command]
-pub async fn get_all_animals_eager(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec<AnimalEager>, String> {
+pub async fn get_all_animals_eager(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec<AnimalEagerResponse>, String> {
     let animals = sqlx::query_as!(
         AnimalEager,
         "SELECT * FROM animal, volunteer",
     )
     .fetch_all(&state.pool)
     .await;
-
-    
-    
+ 
     match animals {
         Ok(animals) => {
-
-            let response: Vec<AnimalEagerResponse> = animals.iter().map(|&animal| animal.into_response()).collect::<Vec<AnimalEagerResponse>>();
-            Ok(animals)
+            let response: Vec<AnimalEagerResponse> = animals.clone().iter().map(|animal| animal.into_response()).collect::<Vec<AnimalEagerResponse>>();
+            Ok(response)
         },
         Err(error) => Err(error.to_string()),
     }
