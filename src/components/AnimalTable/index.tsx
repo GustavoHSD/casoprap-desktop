@@ -30,6 +30,7 @@ export const AnimalTable = () => {
           setAnimals(response as Row[]);
         })
         .catch((error) => console.error(error));
+      invoke("get_all_animals_eager").then((response) => console.log(response));
     };
 
     fetchData();
@@ -57,7 +58,7 @@ export const AnimalTable = () => {
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col" style={{ width: "40%" }}>
+            <th scope="col" style={{ maxWidth: "100px" }}>
               Nome
             </th>
             <th scope="col">Raca</th>
@@ -66,16 +67,17 @@ export const AnimalTable = () => {
             <th scope="col" style={{ width: "40%" }}>
               Local de resgate
             </th>
-            <th scope="col">E adotado</th>
-            <th scope="col">E cadastrado</th>
+            <th scope="col">É adotado</th>
+            <th scope="col">É cadastrado</th>
             <th scope="col">Voluntario responsavel</th>
-            <th scope="col">Acoes</th>
+            <th scope="col">Ações</th>
           </tr>
         </thead>
         <tbody className="align-middle">
           {animals &&
             animals.map((row: Row) => {
               return (
+<<<<<<< HEAD
                 <tr key={row.animal.id}>
                   <td scope="row" style={{ padding: 20 }}>
                     {row.animal.id}
@@ -102,6 +104,25 @@ export const AnimalTable = () => {
                   <td className="d-flex justify-content-evenly">
                     <ActionButton
                       action={() => handleDeleteAnimal(row.animal.id)}
+=======
+                <tr key={animal.animal_id}>
+                  <td scope="row" style={{ padding: 20 }}>
+                    {animal.animal_id}
+                  </td>
+                  <td style={{ maxWidth: "200px", overflowX: "auto" }}>
+                    {animal.animal_name}
+                  </td>
+                  <td>{animal.animal_race}</td>
+                  <td>{animal.animal_type === "dog" ? "cachorro" : "gato"}</td>
+                  <td>{animal.animal_age}</td>
+                  <td>{animal.animal_rescue_location}</td>
+                  <td>{animal.animal_is_adopted ? "sim" : "nao"}</td>
+                  <td>{animal.animal_is_castrated ? "sim" : "nao"}</td>
+                  <td>{animal.animal_responsible_volunteer}</td>
+                  <td className="d-flex justify-content-evenly">
+                    <ActionButton
+                      action={() => handleDeleteAnimal(animal.animal_id)}
+>>>>>>> main
                       icon={
                         <MdOutlineDeleteForever
                           className="icon"

@@ -4,6 +4,7 @@
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 
 mod api;
+mod error;
 
 struct SqlitePoolWrapper {
     pub pool: SqlitePool,
@@ -31,7 +32,7 @@ async fn main() {
             api::volunteer::get_volunteer,
             api::volunteer::update_volunteer,
             api::volunteer::delete_volunteer,
-            api::animal::create_animal,
+            api::animal::create_animal,  
             api::animal::get_all_animals,
             api::animal::get_all_animals_eager,
             api::animal::get_animal,

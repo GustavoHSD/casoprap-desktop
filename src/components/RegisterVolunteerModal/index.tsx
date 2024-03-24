@@ -4,26 +4,21 @@ import { invoke } from "@tauri-apps/api";
 import { sendNotification } from "@tauri-apps/api/notification";
 import Modal from "react-bootstrap/esm/Modal";
 import { Button, Form } from "react-bootstrap";
+import { VolunteerRequest } from "../../types/volunteer";
 
 type RegisterVolunteerModalProps = {
   show: boolean;
   handleClose: () => void;
 };
 
-type VolunteerForm = {
-  name: string;
-  cpf: string;
-  is_active: boolean;
-};
-
 export const RegisterVolunteerModal = ({
   show,
   handleClose,
 }: RegisterVolunteerModalProps) => {
-  const [form, setForm] = useState<VolunteerForm>({
-    name: "",
-    cpf: "",
-    is_active: true,
+  const [form, setForm] = useState<VolunteerRequest>({
+    volunteer_name: "",
+    volunteer_cpf: "",
+    volunteer_is_active: true,
   });
 
   const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -58,20 +53,20 @@ export const RegisterVolunteerModal = ({
           <Form.Group>
             <Form.Label>Nome do voluntario</Form.Label>
             <Form.Control
-              name="name"
+              name="volunteer_name"
               type="text"
               placeholder="Digite o nome do voluntario"
-              value={form.name}
+              value={form.volunteer_name}
               onChange={handleFormChange}
             />
           </Form.Group>
           <Form.Group>
             <Form.Label>Cpf do voluntario</Form.Label>
             <Form.Control
-              name="cpf"
+              name="volunteer_cpf"
               type="number"
               placeholder="Digite o cpf do voluntario"
-              value={form.cpf}
+              value={form.volunteer_cpf}
               onChange={handleFormChange}
               minLength={11}
               maxLength={11}

@@ -12,18 +12,19 @@ import { Animals } from "./pages/animals";
 
 const router = createBrowserRouter([
   {
+    id: "root",
     path: "/",
-    element: <Home />,
+    Component: Home,
     errorElement: <ErrorBoundary />,
     children: [
       {
-        path: "/volunteers",
-        element: <Volunteers />,
+        path: "volunteers",
+        Component: Volunteers,
         index: true,
       },
       {
-        path: "/animals",
-        element: <Animals />,
+        path: "animals",
+        Component: Animals,
       },
     ],
   },
@@ -36,7 +37,6 @@ function App() {
 function ErrorBoundary() {
   let error = useRouteError();
   console.error(error);
-  // Uncaught ReferenceError: path is not defined
   return (
     <div>
       Somthing went wrong, click <Link to="/">here</Link> to go back to the home page
