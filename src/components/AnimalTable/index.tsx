@@ -5,12 +5,17 @@ import Table from "react-bootstrap/esm/Table";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { RegisterAnimalModal } from "../RegisterAnimalModal";
 import { invoke } from "@tauri-apps/api";
-import { Volunteer } from "../../types/volunteer";
-import { sendNotification } from "@tauri-apps/api/notification";
 import { ActionButton } from "../button";
+import { Volunteer } from "../../types/volunteer";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+
+type Row = {
+  volunteer: Volunteer;
+  animal: Animal;
+};
 
 export const AnimalTable = () => {
-  const [animals, setAnimals] = useState<Animal[]>();
+  const [animals, setAnimals] = useState<Row[]>();
   const [show, setShow] = useState(false);
 
   const [deletedAnimal, setDeletedAnimal] = useState(false);
@@ -20,9 +25,9 @@ export const AnimalTable = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      invoke("get_all_animals")
+      invoke("get_all_animals_eager")
         .then((response) => {
-          setAnimals(response as Animal[]);
+          setAnimals(response as Row[]);
         })
         .catch((error) => console.error(error));
     };
@@ -33,19 +38,6 @@ export const AnimalTable = () => {
   const handleDeleteAnimal = (id: number) => {
     invoke("delete_animal", { id });
     setDeletedAnimal(!deletedAnimal);
-  };
-
-  const getResponsibleVolunteer = (id: number): Promise<Volunteer> => {
-    const volunteer = invoke("get_volunteer", { id })
-      .then((response) => {
-        return response as Volunteer;
-      })
-      .catch((error) => {
-        sendNotification(error);
-        console.error(error);
-        throw error;
-      });
-    return volunteer;
   };
 
   return (
@@ -60,7 +52,6 @@ export const AnimalTable = () => {
         bordered
         responsive="xxl"
         hover
-        title="Animal table"
         style={{ whiteSpace: "nowrap" }}
       >
         <thead>
@@ -83,23 +74,34 @@ export const AnimalTable = () => {
         </thead>
         <tbody className="align-middle">
           {animals &&
-            animals.map((animal: Animal) => {
+            animals.map((row: Row) => {
               return (
-                <tr key={animal.id}>
+                <tr key={row.animal.id}>
                   <td scope="row" style={{ padding: 20 }}>
-                    {animal.id}
+                    {row.animal.id}
                   </td>
-                  <td style={{ overflowX: "auto" }}>{animal.name}</td>
-                  <td>{animal.race}</td>
-                  <td>{animal.a_type}</td>
-                  <td>{animal.age}</td>
-                  <td>{animal.rescue_location}</td>
-                  <td>{animal.is_adopted ? "sim" : "nao"}</td>
-                  <td>{animal.is_castrated ? "sim" : "nao"}</td>
-                  <td>{animal.responsible_volunteer}</td>
+                  <td style={{ overflowX: "auto" }}>{row.animal.name}</td>
+                  <td>{row.animal.race}</td>
+                  <td>{row.animal.a_type}</td>
+                  <td>{row.animal.age}</td>
+                  <td>{row.animal.rescue_location}</td>
+                  <td>{row.animal.is_adopted ? "sim" : "nao"}</td>
+                  <td>{row.animal.is_castrated ? "sim" : "nao"}</td>
+                  <td>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip>
+                          Nome: {row.volunteer.name}, Cpf: {row.volunteer.cpf}
+                        </Tooltip>
+                      }
+                    >
+                      <div>{row.volunteer.name}</div>
+                    </OverlayTrigger>
+                  </td>
                   <td className="d-flex justify-content-evenly">
                     <ActionButton
-                      action={() => handleDeleteAnimal(animal.id)}
+                      action={() => handleDeleteAnimal(row.animal.id)}
                       icon={
                         <MdOutlineDeleteForever
                           className="icon"
@@ -129,5 +131,5 @@ export const AnimalTable = () => {
       </Table>
       <RegisterAnimalModal show={show} handleClose={handleCloseModal} />
     </div>
-  );
+  )
 };

@@ -2,14 +2,14 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 use crate::SqlitePoolWrapper;
 
-use super::request_validation::RequestValidation;
+use super::{request_validation::RequestValidation, volunteer::Volunteer};
 
 #[derive(Serialize, Debug)]
 pub struct Animal {
     id: i64,
     name: String,
     race: String,
-    a_type: String,
+    animal_type: String,
     age: Option<i64>,
     rescue_location: String,
     is_adopted: bool,
@@ -17,11 +17,59 @@ pub struct Animal {
     responsible_volunteer: i64,
 }
 
+#[derive(Debug, Clone)]
+struct AnimalEager {
+    animal_id: i64,
+    animal_name: String,
+    race: String,
+    animal_type: String,
+    age: Option<i64>,
+    rescue_location: String,
+    is_adopted: bool,
+    is_castrado: bool,
+    responsible_volunteer: i64,
+    volunteer_id: i64,
+    volunteer_name: String,
+    cpf: String,
+    is_active: bool,
+}
+
+#[derive(Serialize)]
+pub struct AnimalEagerResponse {
+    animal: Animal,
+    volunteer: Volunteer,
+}
+
+impl From<&AnimalEager> for AnimalEagerResponse {
+    fn from(animal: &AnimalEager) -> Self {
+        AnimalEagerResponse {
+            animal: Animal {
+                id: animal.animal_id,
+                name: animal.animal_name.clone(),
+                race: animal.race.clone(),
+                animal_type: animal.animal_type.clone(),
+                age: animal.age,
+                rescue_location: animal.rescue_location.clone(),
+                is_adopted: animal.is_adopted,
+                is_castrado: animal.is_castrado,
+                responsible_volunteer: animal.responsible_volunteer, 
+            },
+            volunteer: Volunteer {
+                id: animal.volunteer_id,
+                name: animal.volunteer_name.clone(),
+                cpf: animal.cpf.clone(),
+                is_active: animal.is_active,
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize)]
 pub struct AnimalRequest {
     name: String,
     race: String,
-    a_type: String,
+    animal_type: String,
     age: Option<i64>,
     rescue_location: String,
     is_castrado: bool,
@@ -30,7 +78,7 @@ pub struct AnimalRequest {
 
 impl RequestValidation for AnimalRequest {
     fn validate_fields(&self) -> Result<(), super::request_validation::ValidationError> {
-        if self.name.trim().is_empty() || self.race.trim().is_empty() || self.a_type.trim().is_empty() || self.rescue_location.is_empty() {
+        if self.name.trim().is_empty() || self.race.trim().is_empty() || self.animal_type.trim().is_empty() || self.rescue_location.is_empty() {
             return Err(super::request_validation::ValidationError::FieldValidationError("All fields must not be empty".to_owned()))
         }
         Ok(())
@@ -41,10 +89,10 @@ impl RequestValidation for AnimalRequest {
 pub async fn create_animal(animal_req: AnimalRequest, state: State<'_, SqlitePoolWrapper>,) -> Result<String, String> {
    match animal_req.validate_fields() {
         Ok(_) => {
-            let query_result = sqlx::query!("INSERT INTO animal (name, race, a_type, age, rescue_location, is_castrado, responsible_volunteer) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            let query_result = sqlx::query!("INSERT INTO animal (name, race, animal_type, age, rescue_location, is_castrado, responsible_volunteer) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 animal_req.name,
                 animal_req.race,
-                animal_req.a_type,
+                animal_req.animal_type,
                 animal_req.age,
                 animal_req.rescue_location,
                 animal_req.is_castrado,
@@ -86,6 +134,24 @@ pub async fn get_all_animals(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec
 }
 
 #[tauri::command]
+pub async fn get_all_animals_eager(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec<AnimalEagerResponse>, String> {
+    let animals = sqlx::query_as!(
+        AnimalEager,
+        "SELECT animal.id AS animal_id, animal.name AS animal_name, race, animal_type, age, rescue_location, is_adopted, is_castrado, responsible_volunteer, volunteer.id as volunteer_id, volunteer.name AS volunteer_name, cpf, is_active FROM animal, volunteer",
+    )
+    .fetch_all(&state.pool)
+    .await;
+    
+    match animals {
+        Ok(animals) => { 
+            let animal_response = animals.clone().iter().map(|animal| AnimalEagerResponse::from(animal)).collect();
+
+            Ok(animal_response)
+        },
+        Err(error) => Err(error.to_string()),
+    }
+}
+#[tauri::command]
 pub async fn get_animal(id: i64, state: State<'_, SqlitePoolWrapper>,) -> Result<Animal, String> {
     let animal = sqlx::query_as!(
         Animal,
@@ -106,10 +172,10 @@ pub async fn update_animal(id: i64, animal_req: AnimalRequest, state: State<'_, 
     match animal_req.validate_fields() {
         Ok(_) => {
             let query_result = sqlx::query!(
-                "UPDATE animal SET name = ?, race = ?, a_type = ?, age = ?, rescue_location = ?, is_castrado = ? WHERE responsible_volunteer = ?",
+                "UPDATE animal SET name = ?, race = ?, animal_type = ?, age = ?, rescue_location = ?, is_castrado = ? WHERE responsible_volunteer = ?",
                 animal_req.name,
                 animal_req.race,
-                animal_req.a_type,
+                animal_req.animal_type,
                 animal_req.age,
                 animal_req.rescue_location,
                 animal_req.is_castrado,

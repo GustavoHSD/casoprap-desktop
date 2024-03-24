@@ -7,10 +7,10 @@ use super::request_validation::RequestValidation;
 
 #[derive(Serialize, Debug)]
 pub struct Volunteer {
-    id: i64,
-    name: String,
-    cpf: String,
-    is_active: bool,
+    pub id: i64,
+    pub name: String,
+    pub cpf: String,
+    pub is_active: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

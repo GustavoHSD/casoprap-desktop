@@ -33,6 +33,7 @@ async fn main() {
             api::volunteer::delete_volunteer,
             api::animal::create_animal,
             api::animal::get_all_animals,
+            api::animal::get_all_animals_eager,
             api::animal::get_animal,
             api::animal::update_animal,
             api::animal::delete_animal, 

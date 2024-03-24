@@ -7,16 +7,7 @@ import Form from "react-bootstrap/esm/Form";
 import Button from "react-bootstrap/esm/Button";
 import Modal from "react-bootstrap/esm/Modal";
 import Select from "react-select";
-
-type VolunteerForm = {
-  name: string;
-  race: string;
-  a_type: string;
-  age: number | undefined;
-  rescue_location: string;
-  is_castrado: boolean;
-  responsible_volunteer: number | undefined;
-};
+import { AnimalRequest } from "../../types/animal";
 
 type RegisterAnimalModalProps = {
   show: boolean;
@@ -27,20 +18,21 @@ type Option = {
   label: string;
   value: number;
 };
+
 export const RegisterAnimalModal = ({
   show,
   handleClose,
 }: RegisterAnimalModalProps) => {
   const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<number>();
-
-  const [form, setForm] = useState<VolunteerForm>({
+  const [form, setForm] = useState<AnimalRequest>({
     name: "",
     race: "",
-    a_type: "",
+    animal_type: "",
     age: 0,
     rescue_location: "",
-    is_castrado: false,
+    is_adopted: false,
+    is_castrato: false,
     responsible_volunteer: -1,
   });
 
@@ -128,7 +120,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="gato"
                 type="radio"
-                name="a_type"
+                name="animal_type"
                 value="cat"
                 onChange={handleFormChange}
               />
@@ -136,7 +128,7 @@ export const RegisterAnimalModal = ({
                 inline
                 label="cachorro"
                 type="radio"
-                name="a_type"
+                name="animal_type"
                 value="dog"
                 onChange={handleFormChange}
               />

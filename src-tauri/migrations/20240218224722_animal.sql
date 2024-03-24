@@ -4,7 +4,7 @@ CREATE TABLE animal (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
     race VARCHAR(255) NOT NULL,
-    a_type VARCHAR(255) NOT NULL,
+    animal_type VARCHAR(255) NOT NULL,
     age INTEGER,
     rescue_location VARCHAR(255) NOT NULL,
     is_adopted BOOLEAN NOT NULL DEFAULT 1,

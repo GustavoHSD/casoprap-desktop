@@ -5,5 +5,5 @@ export type Resource = {
   volunteer_id: number;
 };
 
-export type ResourceReq = Omit<Resource, 'id'>; 
+export type ResourceRequest = Omit<Resource, 'id'>; 
 
