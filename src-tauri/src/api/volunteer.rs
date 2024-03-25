@@ -7,29 +7,22 @@ use super::request_validation::RequestValidation;
 
 #[derive(Serialize, Debug)]
 pub struct Volunteer {
-<<<<<<< HEAD
     pub id: i64,
     pub name: String,
     pub cpf: String,
     pub is_active: bool,
-=======
-    pub volunteer_id: i64,
-    pub volunteer_name: String,
-    pub volunteer_cpf: String,
-    pub volunteer_is_active: bool,
->>>>>>> main
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VolunteerRequest {
-    volunteer_name: String,
-    volunteer_cpf: String,
-    volunteer_is_active: bool,
+    name: String,
+    cpf: String,
+    is_active: bool,
 }
 
 impl RequestValidation for VolunteerRequest {
     fn validate_fields(&self) -> Result<(), ValidationError> {
-        if self.volunteer_name.trim().is_empty() || self.volunteer_cpf.trim().is_empty() {
+        if self.name.trim().is_empty() || self.cpf.trim().is_empty() {
             return Err(crate::error::ValidationError::FieldValidationError("Name and cpf must not be empty".to_owned()))
         }
         Ok(())
@@ -40,9 +33,9 @@ impl RequestValidation for VolunteerRequest {
 pub async fn create_volunteer(volunteer_req: VolunteerRequest, state: State<'_, SqlitePoolWrapper>,) -> Result<String, String> {
     match volunteer_req.validate_fields() {
         Ok(_) => {
-            let query_result = sqlx::query!("INSERT INTO volunteer (volunteer_name, volunteer_cpf, volunteer_is_active) VALUES (?, ?, true)",
-            volunteer_req.volunteer_name,
-            volunteer_req.volunteer_cpf
+            let query_result = sqlx::query!("INSERT INTO volunteer (name, cpf, is_active) VALUES (?, ?, true)",
+            volunteer_req.name,
+            volunteer_req.cpf
             )
             .execute(&state.pool)
             .await;
@@ -82,7 +75,7 @@ pub async fn get_all_volunteers(state: State<'_, SqlitePoolWrapper>,) -> Result<
 pub async fn get_volunteer(id: i64, state: State<'_, SqlitePoolWrapper>,) -> Result<Volunteer, String> {
     let volunteer = sqlx::query_as!(
         Volunteer,
-        "SELECT * FROM volunteer WHERE volunteer_id = ?",
+        "SELECT * FROM volunteer WHERE id = ?",
         id
     )
     .fetch_one(&state.pool)
@@ -99,10 +92,10 @@ pub async fn update_volunteer(id: i64, volunteer_req: VolunteerRequest, state: S
     match volunteer_req.validate_fields() {
         Ok(_) => {
             let query_result = sqlx::query!(
-                "UPDATE volunteer SET volunteer_name = ?, volunteer_cpf = ?, volunteer_is_active = ? WHERE volunteer_id = ?",
-                volunteer_req.volunteer_name,
-                volunteer_req.volunteer_cpf,
-                volunteer_req.volunteer_is_active,
+                "UPDATE volunteer SET name = ?, cpf = ?, is_active = ? WHERE id = ?",
+                volunteer_req.name,
+                volunteer_req.cpf,
+                volunteer_req.is_active,
                 id
             )
             .execute(&state.pool)
@@ -121,7 +114,7 @@ pub async fn update_volunteer(id: i64, volunteer_req: VolunteerRequest, state: S
 #[tauri::command]
 pub async fn delete_volunteer(id: i64, state: State<'_, SqlitePoolWrapper>,) -> Result<String, String> {
     let volunteer = sqlx::query!(
-        "DELETE FROM volunteer WHERE volunteer_id = ?",
+        "DELETE FROM volunteer WHERE id = ?",
         id
     )
     .execute(&state.pool)
