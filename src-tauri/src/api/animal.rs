@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 use tauri::State;
-use crate::{error::ValidationError, SqlitePoolWrapper};
 
+use crate::{error::ValidationError, SqlitePoolWrapper};
 use super::{request_validation::RequestValidation, volunteer::Volunteer};
+
 
 #[derive(Serialize, Debug)]
 pub struct Animal {

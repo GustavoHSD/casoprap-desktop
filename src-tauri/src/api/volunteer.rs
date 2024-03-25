@@ -2,7 +2,6 @@ use serde::{Serialize, Deserialize};
 use tauri::State;
 
 use crate::{error::ValidationError, SqlitePoolWrapper};
-
 use super::request_validation::RequestValidation;
 
 #[derive(Serialize, Debug)]
@@ -23,7 +22,7 @@ pub struct VolunteerRequest {
 impl RequestValidation for VolunteerRequest {
     fn validate_fields(&self) -> Result<(), ValidationError> {
         if self.name.trim().is_empty() || self.cpf.trim().is_empty() {
-            return Err(crate::error::ValidationError::FieldValidationError("Name and cpf must not be empty".to_owned()))
+            return Err(ValidationError::FieldValidationError("Name and cpf must not be empty".to_owned()))
         }
         Ok(())
     }
