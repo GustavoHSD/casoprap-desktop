@@ -66,16 +66,16 @@ export const VolunteerTable = () => {
         <tbody className="align-middle">
           {volunteers &&
             volunteers.map((volunteer: Volunteer) => (
-              <tr key={volunteer.volunteer_id}>
+              <tr key={volunteer.id}>
                 <td scope="row" style={{ padding: 20, margin: 0 }}>
-                  {volunteer.volunteer_id}
+                  {volunteer.id}
                 </td>
-                <td>{volunteer.volunteer_name}</td>
-                <td>{volunteer.volunteer_cpf}</td>
-                <td>{volunteer.volunteer_is_active ? "Sim" : "Nao"}</td>
+                <td>{volunteer.name}</td>
+                <td>{volunteer.cpf}</td>
+                <td>{volunteer.is_active ? "Sim" : "Nao"}</td>
                 <td className="d-flex justify-content-evenly">
                   <ActionButton
-                    action={() => handleDeleteVolunteer(volunteer.volunteer_id)}
+                    action={() => handleDeleteVolunteer(volunteer.id)}
                     icon={
                       <MdOutlineDeleteForever
                         className="icon"

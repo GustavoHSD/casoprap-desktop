@@ -1,23 +1,42 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export const AppNavBar = () => {
   return (
-    <Navbar  sticky="top" fixed="top" style={{ marginBottom: '200px'}}>
+    <Navbar sticky="top" fixed="top" style={{ marginBottom: "200px" }}>
       <Container fluid>
         <Navbar.Brand href="#">CASOPRAP</Navbar.Brand>
         <Nav defaultActiveKey="volunteers" fill variant="tabs">
           <Nav.Item>
-            <Nav.Link as="div" eventKey={"volunteers"}>
-              <Link to="/volunteers">Voluntaios</Link>
-            </Nav.Link>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to="/volunteers"
+            >
+              Voluntaios
+            </NavLink>
           </Nav.Item>
-          <Nav.Link as="div" eventKey={"animal"}>
-            <Link to="/animals">Animais</Link>
-          </Nav.Link>
-          <Nav.Link as="div" eventKey={"resources"}>
-            <Link to="/resources">Recursos</Link>
-          </Nav.Link>
+          <Nav.Item>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to="/animals"
+            >
+              Animais
+            </NavLink>
+          </Nav.Item>
+          <Nav.Item>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to="/resources"
+            >
+              Recursos
+            </NavLink>
+          </Nav.Item>
         </Nav>
       </Container>
     </Navbar>

@@ -26,25 +26,14 @@ export const RegisterAnimalModal = ({
   const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<number>();
   const [form, setForm] = useState<AnimalRequest>({
-<<<<<<< HEAD
     name: "",
     race: "",
     animal_type: "",
     age: 0,
     rescue_location: "",
     is_adopted: false,
-    is_castrato: false,
+    is_castrado: false,
     responsible_volunteer: -1,
-=======
-    animal_name: "",
-    animal_race: "",
-    animal_type: "",
-    animal_age: 0,
-    animal_rescue_location: "",
-    animal_is_adopted: false,
-    animal_is_castrado: false,
-    animal_responsible_volunteer: -1,
->>>>>>> main
   });
 
   const handleFormChange = (
