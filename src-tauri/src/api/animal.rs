@@ -18,7 +18,18 @@ pub struct Animal {
     responsible_volunteer: i64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize)]
+pub struct AnimalRequest {
+    name: String,
+    race: String,
+    animal_type: String,
+    age: Option<i64>,
+    rescue_location: String,
+    is_castrado: bool,
+    responsible_volunteer: i64
+}
+
+#[derive(Clone)]
 struct AnimalEager {
     animal_id: i64,
     animal_name: String,
@@ -66,23 +77,21 @@ impl From<&AnimalEager> for AnimalEagerResponse {
 }
 
 
-#[derive(Serialize, Deserialize)]
-pub struct AnimalRequest {
-    name: String,
-    race: String,
-    animal_type: String,
-    age: Option<i64>,
-    rescue_location: String,
-    is_castrado: bool,
-    responsible_volunteer: i64
-}
-
 impl RequestValidation for AnimalRequest {
     fn validate_fields(&self) -> Result<(), ValidationError> {
         if self.name.trim().is_empty() || self.race.trim().is_empty() || self.animal_type.trim().is_empty() || self.rescue_location.is_empty() {
             return Err(ValidationError::FieldValidationError("All fields must not be empty".to_owned()))
         }
         Ok(())
+    }
+    async fn validate_database_constraint(&self, state: State<'_, SqlitePoolWrapper>) -> Result<(), ValidationError> {
+        let query_result = sqlx::query!("SELECT * FROM volunteer WHERE id = ?", self.responsible_volunteer)
+            .fetch_one(&state.pool)
+            .await;
+        match query_result {
+            Ok(_) => Ok(()),
+            Err(_) => return Err(ValidationError::DatabaseValidationError(format!("Volunteer of id = {} does not exist", self.responsible_volunteer)))
+        }
     }
 }
 
@@ -112,7 +121,6 @@ pub async fn create_animal(animal_req: AnimalRequest, state: State<'_, SqlitePoo
         },
         Err(error) => return Err(error.to_string())
     }
-
 }
 
 #[tauri::command]
@@ -134,15 +142,28 @@ pub async fn get_all_animals(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec
 pub async fn get_all_animals_eager(state: State<'_, SqlitePoolWrapper>,) -> Result<Vec<AnimalEagerResponse>, String> {
     let animals = sqlx::query_as!(
         AnimalEager,
-        "SELECT animal.id AS animal_id, animal.name AS animal_name, race, animal_type, age, rescue_location, is_adopted, is_castrado, responsible_volunteer, volunteer.id as volunteer_id, volunteer.name AS volunteer_name, cpf, is_active FROM animal, volunteer",
+        "SELECT 
+            animal.id AS animal_id, 
+            animal.name AS animal_name, 
+            race, 
+            animal_type, 
+            age, 
+            rescue_location, 
+            is_adopted, 
+            is_castrado, 
+            responsible_volunteer, 
+            volunteer.id as volunteer_id, 
+            volunteer.name AS volunteer_name, 
+            cpf, 
+            is_active 
+        FROM animal LEFT JOIN volunteer ON responsible_volunteer = volunteer.id",
     )
     .fetch_all(&state.pool)
     .await;
     
     match animals {
         Ok(animals) => { 
-            let animal_response = animals.clone().iter().map(|animal| AnimalEagerResponse::from(animal)).collect();
-
+            let animal_response: Vec<AnimalEagerResponse> = animals.clone().iter().map(|animal| AnimalEagerResponse::from(animal)).collect();
             Ok(animal_response)
         },
         Err(error) => Err(error.to_string()),

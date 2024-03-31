@@ -38,6 +38,12 @@ async fn main() {
             api::animal::get_animal,
             api::animal::update_animal,
             api::animal::delete_animal, 
+            api::resource::create_resource,  
+            api::resource::get_all_resources,
+            api::resource::get_all_resources_eager,
+            api::resource::get_resource,
+            api::resource::update_resource,
+            api::resource::delete_resource, 
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

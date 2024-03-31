@@ -27,6 +27,7 @@ export const AnimalTable = () => {
     const fetchData = () => {
       invoke("get_all_animals_eager")
         .then((response) => {
+          console.log(response);
           setAnimals(response as Row[]);
         })
         .catch((error) => console.error(error));
@@ -131,5 +132,5 @@ export const AnimalTable = () => {
       </Table>
       <RegisterAnimalModal show={show} handleClose={handleCloseModal} />
     </div>
-  )
+  );
 };

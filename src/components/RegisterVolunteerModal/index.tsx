@@ -16,9 +16,9 @@ export const RegisterVolunteerModal = ({
   handleClose,
 }: RegisterVolunteerModalProps) => {
   const [form, setForm] = useState<VolunteerRequest>({
-    volunteer_name: "",
-    volunteer_cpf: "",
-    volunteer_is_active: true,
+    name: "",
+    cpf: "",
+    is_active: true,
   });
 
   const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -49,34 +49,41 @@ export const RegisterVolunteerModal = ({
         <Modal.Title>Adicionar Voluntario</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit}>
+        <Form id="volunteer-form" onSubmit={handleSubmit}>
           <Form.Group>
             <Form.Label>Nome do voluntario</Form.Label>
             <Form.Control
-              name="volunteer_name"
+              name="name"
               type="text"
               placeholder="Digite o nome do voluntario"
-              value={form.volunteer_name}
+              value={form.name}
               onChange={handleFormChange}
             />
           </Form.Group>
           <Form.Group>
             <Form.Label>Cpf do voluntario</Form.Label>
             <Form.Control
-              name="volunteer_cpf"
+              name="cpf"
               type="number"
               placeholder="Digite o cpf do voluntario"
-              value={form.volunteer_cpf}
+              value={form.cpf}
               onChange={handleFormChange}
               minLength={11}
               maxLength={11}
             />
           </Form.Group>
-          <Button variant="primary" type="submit">
-            Cadastrar voluntario
-          </Button>
         </Form>
       </Modal.Body>
+      <Modal.Footer>
+        <Button
+          type="submit"
+          form="volunteer-form"
+          className="mx-auto"
+          variant="primary"
+        >
+          Cadastrar voluntario
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

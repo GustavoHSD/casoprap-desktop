@@ -60,10 +60,6 @@ pub async fn get_all_volunteers(state: State<'_, SqlitePoolWrapper>,) -> Result<
     
     match volunteer {
         Ok(volunteer) => { 
-            for v in &volunteer {
-                println!("{:?}", v);
-            }
-
             Ok(volunteer)  
         },
         Err(error) => Err(error.to_string()),
