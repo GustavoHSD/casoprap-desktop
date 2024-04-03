@@ -6,25 +6,34 @@ import {
   createBrowserRouter,
   useRouteError,
 } from "react-router-dom";
+import { Root } from "./pages/root";
 import { Home } from "./pages/home";
 import { Volunteers } from "./pages/volunteers";
 import { Animals } from "./pages/animals";
+import { Resource } from "./pages/resources";
 
 const router = createBrowserRouter([
   {
     id: "root",
     path: "/",
-    Component: Home,
+    Component: Root,
     errorElement: <ErrorBoundary />,
     children: [
       {
+        index: true,
+        Component: Home,
+      },
+      {
         path: "volunteers",
         Component: Volunteers,
-        index: true,
       },
       {
         path: "animals",
         Component: Animals,
+      },
+      {
+        path: "resources",
+        Component: Resource,
       },
     ],
   },
@@ -39,7 +48,8 @@ function ErrorBoundary() {
   console.error(error);
   return (
     <div>
-      Somthing went wrong, click <Link to="/">here</Link> to go back to the home page
+      Somthing went wrong, click <Link to="/">here</Link> to go back to the home
+      page
     </div>
   );
 }
