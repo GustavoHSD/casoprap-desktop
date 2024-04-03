@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Resource } from "../../types/resource";
-import "./styles.css";
-import { IoPersonAdd, IoPersonAddSharp } from "react-icons/io5";
+import { IoPersonAdd } from "react-icons/io5";
 import { Volunteer } from "../../types/volunteer";
 import { invoke } from "@tauri-apps/api";
 import { ActionButton } from "../button";
@@ -9,18 +8,18 @@ import Table from "react-bootstrap/esm/Table";
 import OverlayTrigger from "react-bootstrap/esm/OverlayTrigger";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import { RegisterResourceModal } from "../RegisterResourceModal";
+import { RegisterResourceModal } from "../ResourceModal";
 
 type Row = {
   volunteer: Volunteer;
   resource: Resource;
 };
 
-export const AnimalTable = () => {
+export const ResourceTable = () => {
   const [rows, setRows] = useState<Row[]>();
   const [show, setShow] = useState(false);
 
-  const [deletedAnimal, setDeletedAnimal] = useState(false);
+  const [tableHasChanged, setTableHasChanged] = useState(false);
 
   const handleOpenModal = () => setShow(true);
   const handleCloseModal = () => setShow(false);
@@ -35,91 +34,83 @@ export const AnimalTable = () => {
     };
 
     fetchData();
-  }, [show, deletedAnimal]);
+  }, [show, tableHasChanged]);
 
   const handleDeleteAnimal = (id: number) => {
-    invoke("delete_animal", { id });
-    setDeletedAnimal(!deletedAnimal);
+    invoke("delete_resource", { id });
+    setTableHasChanged(!tableHasChanged);
   };
 
   return (
-    <div style={{ width: "90vw", margin: "0 auto" }}>
+    <div className="table-container">
       <ActionButton
         action={handleOpenModal}
         icon={<IoPersonAdd />}
         title="adicionar"
       />
-      <Table
-        striped
-        bordered
-        responsive="xxl"
-        hover
-        style={{ whiteSpace: "nowrap" }}
-      >
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col" style={{ width: "40%" }}>
-                Descricao 
-            </th>
-            <th scope="col">Preco</th>
-            <th scope="col">Voluntario Associado</th>
-            <th scope="col">Acoes</th>
-          </tr>
-        </thead>
-        <tbody className="align-middle">
-          {rows &&
-            rows.map((row: Row) => {
-              return (
-                <tr key={row.resource.id}>
-                  <td scope="row" style={{ padding: 20 }}>
-                    {row.resource.id}
-                  </td>
-                  <td>{row.resource.description}</td>
-                  <td>{row.resource.price}</td> 
-                  <td>
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip>
-                          Nome: {row.volunteer.name}, Cpf: {row.volunteer.cpf}
-                        </Tooltip>
-                      }
-                    >
-                      <div>{row.volunteer.name}</div>
-                    </OverlayTrigger>
-                  </td>
-                  <td className="d-flex justify-content-evenly">
-                    <ActionButton
-                      action={() => handleDeleteAnimal(row.resource.id)}
-                      icon={
-                        <MdOutlineDeleteForever
-                          className="icon"
-                          size={32}
-                          color="black"
-                        />
-                      }
-                      title="deletar"
-                    />
+      <div className="table-wrapper">
+        <Table striped hover>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th style={{ width: "50%" }}>Descricao</th>
+              <th style={{ width: "30%" }}>Preco</th>
+              <th>Voluntario Associado</th>
+              <th style={{ width: "10%" }}>Acoes</th>
+            </tr>
+          </thead>
+          <tbody className="align-middle">
+            {rows &&
+              rows.map((row: Row) => {
+                return (
+                  <tr key={row.resource.id}>
+                    <td scope="row">{row.resource.id}</td>
+                    <td>{row.resource.description}</td>
+                    <td>{row.resource.price}</td>
+                    <td>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={
+                          <Tooltip>
+                            Nome: {row.volunteer.name}, Cpf: {row.volunteer.cpf}
+                          </Tooltip>
+                        }
+                      >
+                        <div>{row.volunteer.name}</div>
+                      </OverlayTrigger>
+                    </td>
+                    <td>
+                      <ActionButton
+                        action={() => handleDeleteAnimal(row.resource.id)}
+                        icon={
+                          <MdOutlineDeleteForever
+                            className="icon"
+                            size={32}
+                            color="black"
+                          />
+                        }
+                        title="deletar"
+                      />
 
-                    <ActionButton
-                      action={() => {}}
-                      icon={
-                        <MdOutlineEdit
-                          className="icon"
-                          size={32}
-                          color="black"
-                        />
-                      }
-                      title="editar"
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </Table>
+                      <ActionButton
+                        action={() => {}}
+                        icon={
+                          <MdOutlineEdit
+                            className="icon"
+                            size={32}
+                            color="black"
+                          />
+                        }
+                        title="editar"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </Table>
+      </div>
       <RegisterResourceModal show={show} handleClose={handleCloseModal} />
     </div>
-  )
-};;
+  );
+};

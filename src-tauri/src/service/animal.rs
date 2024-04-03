@@ -25,6 +25,7 @@ pub struct AnimalRequest {
     animal_type: String,
     age: Option<i64>,
     rescue_location: String,
+    is_adopted: bool,
     is_castrado: bool,
     responsible_volunteer: i64
 }
@@ -190,12 +191,13 @@ pub async fn update_animal(id: i64, animal_req: AnimalRequest, state: State<'_, 
     match animal_req.validate_fields() {
         Ok(_) => {
             let query_result = sqlx::query!(
-                "UPDATE animal SET name = ?, race = ?, animal_type = ?, age = ?, rescue_location = ?, is_castrado = ? WHERE responsible_volunteer = ?",
+                "UPDATE animal SET name = ?, race = ?, animal_type = ?, age = ?, rescue_location = ?, is_adopted = ?,  is_castrado = ? WHERE id = ?",
                 animal_req.name,
                 animal_req.race,
                 animal_req.animal_type,
                 animal_req.age,
                 animal_req.rescue_location,
+                animal_req.is_adopted,
                 animal_req.is_castrado,
                 id
             )

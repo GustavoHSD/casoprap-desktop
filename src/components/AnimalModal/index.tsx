@@ -1,63 +1,60 @@
-import { FormEvent, useEffect, useState } from "react";
-import { IoCloseSharp } from "react-icons/io5";
-import { Volunteer } from "../../types/volunteer";
-import Select from "react-select";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import { sendNotification } from "@tauri-apps/api/notification";
+import Form from "react-bootstrap/esm/Form";
+import Button from "react-bootstrap/esm/Button";
 import Modal from "react-bootstrap/esm/Modal";
-import { ResourceRequest } from "../../types/resource";
+import { AnimalForm, AnimalRequest } from "../../types/animal";
+import { VolunteerSelect } from "../volunteerSelect";
 
-type Option = {
-  value: number;
-  label: string;
-};
-
-type RegisterResourceModalProps = {
+type RegisterAnimalModalProps = {
   show: boolean;
   handleClose: () => void;
 };
 
-export const RegisterResourceModal = ({
+export const RegisterAnimalModal = ({
   show,
   handleClose,
-}: RegisterResourceModalProps) => {
-  const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
-  const [selectedOption, setSelectedOption] = useState<number>();
-  const [form, setForm] = useState<ResourceRequest>({
-    description: "",
-    price: 0,
-    volunteer_id: -1,
+}: RegisterAnimalModalProps) => {
+  const [form, setForm] = useState<AnimalForm>({
+    name: "",
+    race: "",
+    animal_type: "",
+    age: "",
+    rescue_location: "",
+    is_adopted: false,
+    is_castrado: "",
+    responsible_volunteer: "",
   });
 
-  useEffect(() => {
-    const fetchVolunteers = async () => {
-      invoke("find_all_volunteers").then((response) => {
-        const volunteers = response as Volunteer[];
-        setVolunteerOptions(
-          volunteers.map((volunteer: Volunteer) => ({
-            value: volunteer.id,
-            label: volunteer.name + "/" + volunteer.cpf,
-          }))
-        );
-      });
-    };
+  const handleFormChange = (
+    event:
+      | ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: string } }
+  ) => {
+    const { name, value } = event.target;
 
-    fetchVolunteers();
-  }, []);
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    invoke("create_resource", {
-      description,
-      price: Number(price),
-      volunteer_id: volunteerId,
-    })
+    const formReq: AnimalRequest = {
+      ...form,
+      age: parseInt(form.age),
+      responsible_volunteer: parseInt(form.responsible_volunteer),
+      is_castrado: form.is_castrado === "yes" ? true : false,
+    };
+    invoke("create_animal", { animalReq: formReq })
       .then((response) => {
         if (response === "Success") {
-          sendNotification("Recurso cadastrado com sucesso!");
+          sendNotification("Animal cadastrado com sucesso!");
+          handleClose();
         } else {
-          sendNotification("Algo de errado aconteceu");
+          sendNotification("Algo de errado aconteceu, tente novamente!");
         }
       })
       .catch((error) => sendNotification(error));
@@ -154,31 +151,23 @@ export const RegisterResourceModal = ({
           </Form.Group>
           <Form.Group>
             <Form.Label>Voluntario Responsavel</Form.Label>
-            <Select
+            <VolunteerSelect
+              handleFormChange={handleFormChange}
               name="responsible_volunteer"
-              options={volunteerOption}
-              onChange={(o) => {
-                setSelectedOption(o?.value);
-                handleFormChange({
-                  target: {
-                    name: "responsible_volunteer",
-                    value: selectedOption?.toString() ?? "",
-                  },
-                });
-              }}
             />
           </Form.Group>
-          <Button
-            type="submit"
-            form="animal-form"
-            className="mx-auto"
-            variant="primary"
-          >
-            Cadastrar voluntario
-          </Button>
         </Form>
       </Modal.Body>
-      <Modal.Footer></Modal.Footer>
+      <Modal.Footer>
+        <Button
+          type="submit"
+          form="animal-form"
+          className="mx-auto"
+          variant="primary"
+        >
+          Cadastrar animal
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

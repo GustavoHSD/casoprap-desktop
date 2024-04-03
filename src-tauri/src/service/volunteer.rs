@@ -84,6 +84,8 @@ pub async fn get_volunteer(id: i64, state: State<'_, SqlitePoolWrapper>,) -> Res
 
 #[tauri::command]
 pub async fn update_volunteer(id: i64, volunteer_req: VolunteerRequest, state: State<'_, SqlitePoolWrapper>,) -> Result<String, String> { 
+
+        println!("{}", volunteer_req.is_active);
     match volunteer_req.validate_fields() {
         Ok(_) => {
             let query_result = sqlx::query!(
