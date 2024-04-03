@@ -3,7 +3,7 @@
 
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 
-mod api;
+mod service;
 mod error;
 
 struct SqlitePoolWrapper {
@@ -27,23 +27,23 @@ async fn main() {
     tauri::Builder::default()
         .manage(SqlitePoolWrapper{pool})
         .invoke_handler(tauri::generate_handler![
-            api::volunteer::create_volunteer,
-            api::volunteer::get_all_volunteers,
-            api::volunteer::get_volunteer,
-            api::volunteer::update_volunteer,
-            api::volunteer::delete_volunteer,
-            api::animal::create_animal,  
-            api::animal::get_all_animals,
-            api::animal::get_all_animals_eager,
-            api::animal::get_animal,
-            api::animal::update_animal,
-            api::animal::delete_animal, 
-            api::resource::create_resource,  
-            api::resource::get_all_resources,
-            api::resource::get_all_resources_eager,
-            api::resource::get_resource,
-            api::resource::update_resource,
-            api::resource::delete_resource, 
+            service::volunteer::create_volunteer,
+            service::volunteer::get_all_volunteers,
+            service::volunteer::get_volunteer,
+            service::volunteer::update_volunteer,
+            service::volunteer::delete_volunteer,
+            service::animal::create_animal,  
+            service::animal::get_all_animals,
+            service::animal::get_all_animals_eager,
+            service::animal::get_animal,
+            service::animal::update_animal,
+            service::animal::delete_animal, 
+            service::resource::create_resource,  
+            service::resource::get_all_resources,
+            service::resource::get_all_resources_eager,
+            service::resource::get_resource,
+            service::resource::update_resource,
+            service::resource::delete_resource, 
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

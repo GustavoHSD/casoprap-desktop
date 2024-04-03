@@ -5,4 +5,11 @@ export type Resource = {
   volunteer_id: number;
 };
 
+export type ResourceForm = {
+  description: string;
+  price: string;
+  volunteer_id: string;
+};
+
 export type ResourceRequest = Omit<Resource, 'id'>; 
+

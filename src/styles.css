@@ -1,14 +1,45 @@
-tbody td, thead th {
+* {
+  box-sizing: border-box;
+}
+
+
+.table-container {
+    width: 90vw;
+    margin: 0 auto;
+}
+
+.table-wrapper {
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: 60vh;
+}
+
+.table-wrapper tbody td,
+.table-wrapper thead th {
   text-align: center;
 }
 
-tbody td:first-child {
+.table-wrapper tbody td:first-child {
   text-align: start;
-  padding: 0 50px 
+  padding: 0 50px;
 }
 
-tbody td:last-child {
+.table-wrapper tbody td:last-child {
   text-align: end;
+  padding: 0 50px;
+}
 
-  padding: 0 50px 
+.table-wrapper table {
+  white-space: nowrap;
+  margin: 0;
+}
+
+.table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table-wrapper tbody {
+  position: sticky;
 }
