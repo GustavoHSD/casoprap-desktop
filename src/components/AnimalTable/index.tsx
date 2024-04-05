@@ -73,22 +73,11 @@ export const AnimalTable = () => {
           icon={<IoPersonAdd />}
           title="adicionar"
         />
-        <Form.Check
-          id="filter-not-castrated"
-          onChange={handleFilterCastrated}
-        />
-        <Form.Label htmlFor="filter-not-castrated">
-          Mostrar somente animais NAO castrados
-        </Form.Label>
-        <Form.Check id="filter-not-adopted" onChange={handleFilterAdopted} />
-        <Form.Label htmlFor="filter-not-adopted">
-          Mostrar somente animais NAO adotados
-        </Form.Label>
-
-        <Form.Group className="align-self-center">
+        <Form.Group className="align-self-center w-25">
           <Form.Control
             className="align-self-center"
             type="search"
+            placeholder="Digite o nome do animal ou responsavel"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -99,13 +88,49 @@ export const AnimalTable = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th style={{ width: "30%" }}>Nome</th>
-              <th style={{ width: "20%" }}>Raca</th>
+              <th>Nome</th>
+              <th>Raca</th>
               <th>Tipo</th>
               <th>Idade</th>
-              <th style={{ width: "40%" }}>Local de resgate</th>
-              <th>É adotado</th>
-              <th>É castrado</th>
+              <th>Local de resgate</th>
+              <th>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip>
+                      {filterAdopted
+                        ? "Clique para ver todos animais"
+                        : "Clique para ver animais NAO adotados"}
+                    </Tooltip>
+                  }
+                >
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleFilterAdopted()}
+                  >
+                    É adotado
+                  </div>
+                </OverlayTrigger>
+              </th>
+              <th>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip>
+                      {filterCastrated
+                        ? "Clique para ver todos animais"
+                        : "Clique para ver animais NAO castrados"}
+                    </Tooltip>
+                  }
+                >
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleFilterCastrated()}
+                  >
+                    É castrado
+                  </div>
+                </OverlayTrigger>
+              </th>
               <th>Voluntario responsavel</th>
               <th style={{ width: "30%" }}>Ações</th>
             </tr>
@@ -116,10 +141,6 @@ export const AnimalTable = () => {
                 .filter((row: Row) => {
                   return (
                     (row.animal.name.toLowerCase().includes(search) ||
-                      row.animal.id.toString().toLowerCase().includes(search) ||
-                      row.animal.rescue_location
-                        .toLowerCase()
-                        .includes(search) ||
                       row.volunteer.name.toLowerCase().includes(search)) &&
                     (filterAdopted ? row.animal.is_adopted === false : true) &&
                     (filterCastrated ? row.animal.is_castrado === false : true)
