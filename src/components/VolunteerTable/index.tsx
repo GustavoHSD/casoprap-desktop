@@ -54,7 +54,7 @@ export const VolunteerTable = () => {
       <div className="d-flex justify-content-between">
         <ActionButton
           action={handleOpenModal}
-          icon={<IoPersonAdd />}
+          icon={<IoPersonAdd size={24} />}
           title="adicionar"
         />
         <Form.Group className="align-self-center w-25">

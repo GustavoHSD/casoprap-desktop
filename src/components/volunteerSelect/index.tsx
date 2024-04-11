@@ -49,7 +49,7 @@ export const VolunteerSelect = ({
           target: {
             name: name,
             value: o?.value.toString() ?? "",
-          },
+          } as HTMLInputElement,
         });
       }}
     />

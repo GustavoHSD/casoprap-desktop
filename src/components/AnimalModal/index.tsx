@@ -27,16 +27,12 @@ export const RegisterAnimalModal = ({
     responsible_volunteer: "",
   });
 
-  const handleFormChange = (
-    event:
-      | ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: string } }
-  ) => {
-    const { name, value } = event.target;
+  const handleFormChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = event.target;
 
     setForm((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value ?? files[0],
     }));
   };
 
@@ -67,6 +63,16 @@ export const RegisterAnimalModal = ({
       </Modal.Header>
       <Modal.Body>
         <Form id="animal-form" onSubmit={handleSubmit}>
+          <Form.Group className="mb-4">
+            <Form.Label>Foto do animal</Form.Label>
+            <Form.Control
+              name="profile-picture"
+              placeholder="Digite o nome do voluntario"
+              type="file"
+              accept="image/*"
+              onChange={handleFormChange}
+            />
+          </Form.Group>
           <Form.Group className="mb-4">
             <Form.Label>Nome do animal</Form.Label>
             <Form.Control

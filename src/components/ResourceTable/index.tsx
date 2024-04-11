@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Resource } from "../../types/resource";
-import { IoPersonAdd } from "react-icons/io5";
 import { Volunteer } from "../../types/volunteer";
 import { invoke } from "@tauri-apps/api";
 import { ActionButton } from "../button";
@@ -10,6 +9,7 @@ import Tooltip from "react-bootstrap/esm/Tooltip";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { RegisterResourceModal } from "../ResourceModal";
 import Form from "react-bootstrap/esm/Form";
+import { RiMedicineBottleFill } from "react-icons/ri";
 
 type Row = {
   volunteer: Volunteer;
@@ -47,7 +47,7 @@ export const ResourceTable = () => {
       <div className="d-flex justify-content-between">
         <ActionButton
           action={handleOpenModal}
-          icon={<IoPersonAdd />}
+          icon={<RiMedicineBottleFill size={24} />}
           title="adicionar"
         />
         <Form.Group className="align-self-center w-25">

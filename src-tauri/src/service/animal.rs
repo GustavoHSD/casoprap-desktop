@@ -8,6 +8,7 @@ use super::{request_validation::RequestValidation, volunteer::Volunteer};
 #[derive(Serialize, Debug)]
 pub struct Animal {
     id: i64,
+    profile_picture: Option<Vec<u8>>,
     name: String,
     race: String,
     animal_type: String,
@@ -33,6 +34,7 @@ pub struct AnimalRequest {
 #[derive(Clone)]
 struct AnimalEager {
     animal_id: i64,
+    animal_profile_picture: Option<Vec<u8>>,
     animal_name: String,
     race: String,
     animal_type: String,
@@ -58,6 +60,7 @@ impl From<&AnimalEager> for AnimalEagerResponse {
         AnimalEagerResponse {
             animal: Animal {
                 id: animal.animal_id,
+                profile_picture: Some(animal.animal_profile_picture.clone()).expect("No profile picture"),
                 name: animal.animal_name.clone(),
                 race: animal.race.clone(),
                 animal_type: animal.animal_type.clone(),
@@ -145,6 +148,7 @@ pub async fn get_all_animals_eager(state: State<'_, SqlitePoolWrapper>,) -> Resu
         AnimalEager,
         "SELECT 
             animal.id AS animal_id, 
+            animal.profile_picture AS animal_profile_picture,
             animal.name AS animal_name, 
             race, 
             animal_type, 

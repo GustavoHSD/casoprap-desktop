@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Animal } from "../../types/animal";
-import { IoPersonAdd } from "react-icons/io5";
 import Table from "react-bootstrap/esm/Table";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
 import { RegisterAnimalModal } from "../AnimalModal";
@@ -9,6 +8,7 @@ import { ActionButton } from "../button";
 import { Volunteer } from "../../types/volunteer";
 import { Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { sendNotification } from "@tauri-apps/api/notification";
+import { IoIosAddCircle } from "react-icons/io";
 
 type Row = {
   volunteer: Volunteer;
@@ -70,7 +70,7 @@ export const AnimalTable = () => {
       <div className="d-flex justify-content-between">
         <ActionButton
           action={handleOpenModal}
-          icon={<IoPersonAdd />}
+          icon={<IoIosAddCircle size={24} />}
           title="adicionar"
         />
         <Form.Group className="align-self-center w-25">
@@ -88,11 +88,11 @@ export const AnimalTable = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th>Nome</th>
+              <th style={{ width: "30%" }}>Nome</th>
               <th>Raca</th>
-              <th>Tipo</th>
+              <th style={{ width: "15%"}}>Tipo</th>
               <th>Idade</th>
-              <th>Local de resgate</th>
+              <th style={{ width: "40%" }}>Local de resgate</th>
               <th>
                 <OverlayTrigger
                   placement="top"
@@ -132,7 +132,7 @@ export const AnimalTable = () => {
                 </OverlayTrigger>
               </th>
               <th>Voluntario responsavel</th>
-              <th style={{ width: "30%" }}>Ações</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody className="align-middle">

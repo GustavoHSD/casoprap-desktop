@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS animal;
 
 CREATE TABLE animal (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_picture BLOB,
     name VARCHAR(255) NOT NULL,
     race VARCHAR(255) NOT NULL,
     animal_type VARCHAR(255) NOT NULL,

@@ -1,5 +1,6 @@
 export type Animal = {
     id: number,
+    profile_picture?: File,
     name: string,
     race: string,
     animal_type: string,
@@ -11,6 +12,7 @@ export type Animal = {
 }
 
 export type AnimalForm = {
+    profile_picture?: File,
     name: string,
     race: string,
     animal_type: string,
