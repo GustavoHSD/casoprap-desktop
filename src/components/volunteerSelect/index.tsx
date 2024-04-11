@@ -6,9 +6,7 @@ import { invoke } from "@tauri-apps/api";
 type VolunteerSelectProps = {
   name: string;
   placeholder?: string;
-  handleFormChange: (event: {
-    target: { name: string; value: string };
-  }) => void;
+  handleFormChange: (target: { name: string; value: string }) => void;
 };
 
 type Option = {
@@ -20,7 +18,7 @@ export const VolunteerSelect = ({
   name,
   placeholder,
   handleFormChange,
-}: VolunteerSelectProps) => { 
+}: VolunteerSelectProps) => {
   const [volunteerOption, setVolunteerOption] = useState<Option[]>([]);
 
   useEffect(() => {
@@ -46,10 +44,8 @@ export const VolunteerSelect = ({
       options={volunteerOption}
       onChange={(o) => {
         handleFormChange({
-          target: {
-            name: name,
-            value: o?.value.toString() ?? "",
-          } as HTMLInputElement,
+          name: name,
+          value: o?.value.toString() ?? "",
         });
       }}
     />

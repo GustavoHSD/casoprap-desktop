@@ -27,12 +27,21 @@ export const RegisterAnimalModal = ({
     responsible_volunteer: "",
   });
 
-  const handleFormChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFormChangeWithEvent = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     const { name, value, files } = event.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: value ?? files[0],
+    }));
+  };
+
+  const handleFormChangeWithoutEvent = (target: { name: string; value: string }) => {
+    const { name, value } = target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -44,6 +53,7 @@ export const RegisterAnimalModal = ({
       responsible_volunteer: parseInt(form.responsible_volunteer),
       is_castrado: form.is_castrado === "yes" ? true : false,
     };
+    console.log(formReq)
     invoke("create_animal", { animalReq: formReq })
       .then((response) => {
         if (response === "Success") {
@@ -70,7 +80,7 @@ export const RegisterAnimalModal = ({
               placeholder="Digite o nome do voluntario"
               type="file"
               accept="image/*"
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -80,7 +90,7 @@ export const RegisterAnimalModal = ({
               type="text"
               placeholder="Digite o nome do voluntario"
               value={form.name}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -90,7 +100,7 @@ export const RegisterAnimalModal = ({
               type="text"
               placeholder="Digite a raca do animal"
               value={form.race}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -102,7 +112,7 @@ export const RegisterAnimalModal = ({
                 type="radio"
                 name="animal_type"
                 value="cat"
-                onChange={handleFormChange}
+                onChange={handleFormChangeWithEvent}
               />
               <Form.Check
                 inline
@@ -110,7 +120,7 @@ export const RegisterAnimalModal = ({
                 type="radio"
                 name="animal_type"
                 value="dog"
-                onChange={handleFormChange}
+                onChange={handleFormChangeWithEvent}
               />
             </div>
           </Form.Group>
@@ -121,7 +131,7 @@ export const RegisterAnimalModal = ({
               type="number"
               placeholder="Digite a idade do animal"
               value={form.age}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -131,7 +141,7 @@ export const RegisterAnimalModal = ({
               type="text"
               placeholder="Digite o local de resgate do animal"
               value={form.rescue_location}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -143,7 +153,7 @@ export const RegisterAnimalModal = ({
                 type="radio"
                 name="is_castrado"
                 value="yes"
-                onChange={handleFormChange}
+                onChange={handleFormChangeWithEvent}
               />
               <Form.Check
                 inline
@@ -151,14 +161,14 @@ export const RegisterAnimalModal = ({
                 type="radio"
                 name="is_castrado"
                 value="no"
-                onChange={handleFormChange}
+                onChange={handleFormChangeWithEvent}
               />
             </div>
           </Form.Group>
           <Form.Group>
             <Form.Label>Voluntario Responsavel</Form.Label>
             <VolunteerSelect
-              handleFormChange={handleFormChange}
+              handleFormChange={handleFormChangeWithoutEvent}
               name="responsible_volunteer"
             />
           </Form.Group>

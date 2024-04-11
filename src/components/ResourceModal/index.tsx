@@ -1,6 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Volunteer } from "../../types/volunteer";
-import Select from "react-select";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import { sendNotification } from "@tauri-apps/api/notification";
 import Modal from "react-bootstrap/esm/Modal";
