@@ -8,11 +8,13 @@ import { AnimalForm, AnimalRequest } from "../../types/animal";
 import { VolunteerSelect } from "../volunteerSelect";
 
 type RegisterAnimalModalProps = {
+  id?: number;
   show: boolean;
   handleClose: () => void;
 };
 
-export const RegisterAnimalModal = ({
+export const AnimalModal = ({
+  id,
   show,
   handleClose,
 }: RegisterAnimalModalProps) => {
@@ -27,17 +29,41 @@ export const RegisterAnimalModal = ({
     responsible_volunteer: "",
   });
 
-  const handleFormChangeWithEvent = (
-    event: ChangeEvent<HTMLInputElement>,
+  if (id) {
+    invoke("get_animal", { id })
+      .then((response) => {
+        setForm(response as AnimalForm);
+      })
+      .catch((error) => sendNotification(error));
+  }
+
+  const handleFormChangeWithEvent = async (
+    event: ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value, files } = event.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value ?? files[0],
-    }));
+    let finalValue: string | ArrayBuffer | null = value;
+    let reader = new FileReader();
+    if (name === "profile_picture" && files && files[0]) {
+      reader.onloadend = () => {
+        finalValue = reader.result;
+        setForm((prev) => ({
+          ...prev,
+          profile_picture: finalValue,
+        }));
+      };
+      reader.readAsDataURL(files[0]);
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: finalValue,
+      }));
+    }
   };
 
-  const handleFormChangeWithoutEvent = (target: { name: string; value: string }) => {
+  const handleFormChangeWithoutEvent = (target: {
+    name: string;
+    value: string;
+  }) => {
     const { name, value } = target;
     setForm((prev) => ({
       ...prev,
@@ -50,20 +76,33 @@ export const RegisterAnimalModal = ({
     const formReq: AnimalRequest = {
       ...form,
       age: parseInt(form.age),
+      profile_picture: form.profile_picture as string ?? "",
       responsible_volunteer: parseInt(form.responsible_volunteer),
       is_castrado: form.is_castrado === "yes" ? true : false,
     };
-    console.log(formReq)
-    invoke("create_animal", { animalReq: formReq })
-      .then((response) => {
-        if (response === "Success") {
-          sendNotification("Animal cadastrado com sucesso!");
-          handleClose();
-        } else {
-          sendNotification("Algo de errado aconteceu, tente novamente!");
-        }
-      })
-      .catch((error) => sendNotification(error));
+    if (id) {
+      invoke("update_animal", { id: id, animalReq: formReq })
+        .then((response) => {
+          if (response === "Success") {
+            sendNotification("Animal editado com sucesso!");
+            handleClose();
+          } else {
+            sendNotification("Algo de errado aconteceu, tente novamente!");
+          }
+        })
+        .catch((error) => sendNotification(error));
+    } else {
+      invoke("create_animal", { animalReq: formReq })
+        .then((response) => {
+          if (response === "Success") {
+            sendNotification("Animal cadastrado com sucesso!");
+            handleClose();
+          } else {
+            sendNotification("Algo de errado aconteceu, tente novamente!");
+          }
+        })
+        .catch((error) => sendNotification(error));
+    }
   };
 
   return (
@@ -74,9 +113,22 @@ export const RegisterAnimalModal = ({
       <Modal.Body>
         <Form id="animal-form" onSubmit={handleSubmit}>
           <Form.Group className="mb-4">
-            <Form.Label>Foto do animal</Form.Label>
+            <Form.Label>
+              {form.profile_picture !== null ? (
+                <div className="picture-container">
+                  <img
+                    className="picture"
+                    src={form.profile_picture as string}
+                    alt="Animal Picture"
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+              Foto do animal
+            </Form.Label>
             <Form.Control
-              name="profile-picture"
+              name="profile_picture"
               placeholder="Digite o nome do voluntario"
               type="file"
               accept="image/*"

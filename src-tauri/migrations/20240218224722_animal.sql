@@ -2,12 +2,12 @@ DROP TABLE IF EXISTS animal;
 
 CREATE TABLE animal (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    profile_picture BLOB,
-    name VARCHAR(255) NOT NULL,
-    race VARCHAR(255) NOT NULL,
-    animal_type VARCHAR(255) NOT NULL,
+    profile_picture TEXT,
+    name TEXT NOT NULL,
+    race TEXT NOT NULL,
+    animal_type TEXT NOT NULL,
     age INTEGER,
-    rescue_location VARCHAR(255) NOT NULL,
+    rescue_location TEXT NOT NULL,
     is_adopted BOOLEAN NOT NULL DEFAULT 1,
     is_castrado BOOLEAN NOT NULL,
     responsible_volunteer INTEGER NOT NULL,

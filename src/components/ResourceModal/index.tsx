@@ -22,13 +22,19 @@ export const RegisterResourceModal = ({
     volunteer_id: "",
   });
 
-  const handleFormChange = (
-    event:
-      | ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: string } }
+  const handleFormChangeWithEvent = (
+    event: ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = event.target;
 
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+    const handleFormChangeWithoutEvent = (target: { name: string; value: string }) => {
+    const { name, value } = target;
     setForm((prev) => ({
       ...prev,
       [name]: value,
@@ -68,7 +74,7 @@ export const RegisterResourceModal = ({
               type="text"
               placeholder="Digite o nome do voluntario"
               value={form.description}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group className="mb-4">
@@ -77,13 +83,13 @@ export const RegisterResourceModal = ({
               name="price"
               placeholder="Digite o nome do voluntario"
               value={form.price}
-              onChange={handleFormChange}
+              onChange={handleFormChangeWithEvent}
             />
           </Form.Group>
           <Form.Group>
             <Form.Label>Voluntario Responsavel</Form.Label>
             <VolunteerSelect
-              handleFormChange={handleFormChange}
+              handleFormChange={handleFormChangeWithoutEvent}
               name="volunteer_id"
             />
           </Form.Group>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Animal } from "../../types/animal";
 import Table from "react-bootstrap/esm/Table";
 import { MdOutlineDeleteForever, MdOutlineEdit } from "react-icons/md";
-import { RegisterAnimalModal } from "../AnimalModal";
+import { AnimalModal } from "../AnimalModal";
 import { invoke } from "@tauri-apps/api";
 import { ActionButton } from "../button";
 import { Volunteer } from "../../types/volunteer";
@@ -22,6 +22,7 @@ export const AnimalTable = () => {
   const [tableHasChanged, setTableHasChanged] = useState(false);
   const [filterAdopted, setFilterAdopted] = useState(false);
   const [filterCastrated, setFilterCastrated] = useState(false);
+  const [id, setId] = useState<number>();
 
   const handleOpenModal = () => setShow(true);
   const handleCloseModal = () => setShow(false);
@@ -90,7 +91,7 @@ export const AnimalTable = () => {
               <th>#</th>
               <th style={{ width: "30%" }}>Nome</th>
               <th>Raca</th>
-              <th style={{ width: "15%"}}>Tipo</th>
+              <th style={{ width: "15%" }}>Tipo</th>
               <th>Idade</th>
               <th style={{ width: "40%" }}>Local de resgate</th>
               <th>
@@ -149,7 +150,17 @@ export const AnimalTable = () => {
                 .map((row: Row) => {
                   return (
                     <tr key={row.animal.id}>
-                      <td scope="row">{row.animal.id}</td>
+                      <td scope="row">
+                        {row.animal.profile_picture !== null ? (
+                          <div className="picture-container">
+                            <img
+                              className="picture"
+                              src={row.animal.profile_picture}
+                              alt="Animal Picture"
+                            />
+                          </div>
+                        ) : "Sem foto"}
+                      </td>
                       <td>{row.animal.name}</td>
                       <td>{row.animal.race}</td>
                       <td>
@@ -226,7 +237,10 @@ export const AnimalTable = () => {
                         />
 
                         <ActionButton
-                          action={() => {}}
+                          action={() => {
+                            setId(row.animal.id)
+                            handleOpenModal();
+                          }}
                           icon={
                             <MdOutlineEdit
                               className="icon"
@@ -243,7 +257,7 @@ export const AnimalTable = () => {
           </tbody>
         </Table>
       </div>
-      <RegisterAnimalModal show={show} handleClose={handleCloseModal} />
+      <AnimalModal id={id} show={show} handleClose={handleCloseModal} />
     </div>
   );
 };

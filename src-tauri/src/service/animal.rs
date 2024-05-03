@@ -8,7 +8,7 @@ use super::{request_validation::RequestValidation, volunteer::Volunteer};
 #[derive(Serialize, Debug)]
 pub struct Animal {
     id: i64,
-    profile_picture: Option<Vec<u8>>,
+    profile_picture: Option<String>,
     name: String,
     race: String,
     animal_type: String,
@@ -22,6 +22,7 @@ pub struct Animal {
 #[derive(Serialize, Deserialize)]
 pub struct AnimalRequest {
     name: String,
+    profile_picture: Option<String>,
     race: String,
     animal_type: String,
     age: Option<i64>,
@@ -34,7 +35,7 @@ pub struct AnimalRequest {
 #[derive(Clone)]
 struct AnimalEager {
     animal_id: i64,
-    animal_profile_picture: Option<Vec<u8>>,
+    animal_profile_picture: Option<String>,
     animal_name: String,
     race: String,
     animal_type: String,
@@ -105,8 +106,11 @@ impl RequestValidation for AnimalRequest {
 pub async fn create_animal(animal_req: AnimalRequest, state: State<'_, SqlitePoolWrapper>,) -> Result<String, String> {
    match animal_req.validate_fields() {
         Ok(_) => {
-            let query_result = sqlx::query!("INSERT INTO animal (name, race, animal_type, age, rescue_location, is_castrado, responsible_volunteer) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            println!("{:?}", animal_req.profile_picture);
+            let profile_picture = Some(animal_req.profile_picture);
+            let query_result = sqlx::query!("INSERT INTO animal (name, profile_picture, race, animal_type, age, rescue_location, is_castrado, responsible_volunteer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 animal_req.name,
+                profile_picture,
                 animal_req.race,
                 animal_req.animal_type,
                 animal_req.age,
@@ -114,7 +118,7 @@ pub async fn create_animal(animal_req: AnimalRequest, state: State<'_, SqlitePoo
                 animal_req.is_castrado,
                 animal_req.responsible_volunteer,
             )
-            .execute(&state.pool)
+            .execute(&state.pool) 
             .await;
 
             match query_result {
