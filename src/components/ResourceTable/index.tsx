@@ -54,7 +54,7 @@ export const ResourceTable = () => {
           <Form.Control
             className="align-self-center"
             type="search"
-            placeholder="Digite o nome do animal ou responsavel"
+            placeholder="Digite o nome do voluntario"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

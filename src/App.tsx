@@ -2,12 +2,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import {
   Link,
+  Navigate,
   RouterProvider,
   createBrowserRouter,
   useRouteError,
 } from "react-router-dom";
 import { Root } from "./pages/root";
-import { Home } from "./pages/home";
 import { Volunteers } from "./pages/volunteers";
 import { Animals } from "./pages/animals";
 import { Resource } from "./pages/resources";
@@ -21,7 +21,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: Home,
+        Component: () => <Navigate to="volunteers" replace />,
       },
       {
         path: "volunteers",
@@ -48,8 +48,7 @@ function ErrorBoundary() {
   console.error(error);
   return (
     <div>
-      Somthing went wrong, click <Link to="/">here</Link> to go back to the home
-      page
+      Algo de errado aconteceu, clique <Link to="/">aqui</Link> para voltar ao inicio
     </div>
   );
 }

@@ -12,16 +12,6 @@ export const AppNavBar = () => {
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
-              to="/"
-            >
-              Home
-            </NavLink>
-          </Nav.Item>
-          <Nav.Item>
-            <NavLink
-              className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
               to="/volunteers"
             >
               Voluntaios
